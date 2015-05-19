@@ -1,4 +1,5 @@
 # AI-Final-Project
 The final project for the AI course in NTU.
-B00902028 ±O¬Fµq
+B00902028 Â±OÂ¬FÂµq
 R03222055
+D01941029

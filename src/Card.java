@@ -75,6 +75,10 @@ public class Card implements Constant, Comparable<Card>
     {
         return rank;
     }
+    public int getValue()
+    {
+        return (rank < 2) ? rank + 13 : rank;
+    }
 
     public boolean hasSameRank(Card c)
     {

@@ -132,7 +132,8 @@ public class Board extends JPanel
 		}
 		public int compareTo(CardLabel c)
 		{
-			return (this.card.getIndex() > c.card.getIndex())? 1: -1;
+			//return (this.card.getIndex() > c.card.getIndex())? 1: -1;
+            return (this.card.getValue() > c.card.getValue()) ? 1 : -1;
 		}
 	}
 }

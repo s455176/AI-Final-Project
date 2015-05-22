@@ -25,4 +25,12 @@ public interface Constant
 	    static final int handLocationX0 = 220;
 	    static final int handLocationY = 180;
 	    static final int handLocationDX = 120;
+        
+        // Different combinations of cards
+        static final int ILLEGAL  = 0;
+        static final int SINGLE   = 1;
+        static final int PAIR     = 2;
+        static final int TRIPLE   = 3;
+        static final int FOUR     = 4;
+        static final int STRAIGHT = 5;
 }

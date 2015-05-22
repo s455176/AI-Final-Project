@@ -67,11 +67,31 @@ public class Card implements Constant, Comparable<Card>
 	{
 		return index;
 	}
+    public int getSuit()
+    {
+        return suit;
+    }
+    public int getRank()
+    {
+        return rank;
+    }
+
+    public boolean hasSameRank(Card c)
+    {
+        return (this.rank == c.rank) ? true : false;
+    }
+    public boolean hasSameSuit(Card c)
+    {
+        return (this.suit == c.suit) ? true : false;
+    }
 	
 	// unit test 
 	public static void main(String[] args)
 	{
 		Card c = new Card(1, Card.DIAMOND);
+        Card d = new Card(1, Card.DIAMOND);
+        System.out.println(c.hasSameRank(d));
+        System.out.println(c.hasSameSuit(d));
 		System.out.println(c);
 	}
 }

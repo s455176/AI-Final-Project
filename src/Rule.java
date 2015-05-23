@@ -3,6 +3,13 @@ import java.util.ArrayList;
 
 public class Rule implements Constant
 {
+    /**
+     * Return a type in Constant.java that shows which combiantion the 
+     * cards is.
+     *
+     * @param cards a Card array.
+     * @return int type, see Constant.java.
+     */
     public static int combination(Card[] cards)
     {
         int length = cards.length;
@@ -14,16 +21,16 @@ public class Rule implements Constant
         int firstSuit = cards[0].getSuit();
         int firstRank = cards[0].getRank();
 
-        // If cards are in the same suit.
+        // The booleans indicate the cards in the same suit or rank.
         boolean sameSuit = true;
         boolean sameRank = true;
         
-        int ghostPos = 0;
+        int jokerPos = 0;
 
         for (int i = 0; i < length; ++i) 
         {
             int rank = cards[i].getRank();
-            values[i] = (rank < 3) ? rank + 13 : rank;
+            values[i] = (rank < 2) ? rank + 13 : rank;
             if (cards[i].getSuit() != firstSuit)
             {
                 sameSuit = false;
@@ -74,8 +81,15 @@ public class Rule implements Constant
 
         }
     }
-
-    public boolean isLegalMove(Movement lastMove, Movement playMove, 
+    /**
+     * Test whether the movement is a legal move.
+     *
+     * @param playMove the move player want to play.
+     * @param lastMove the move last player played.
+     * @param isRevo whether is revolution right now.
+     * @return boolean shows the move is legal or not.
+     */
+    public static boolean isLegalMove(Movement playMove, Movement lastMove, 
                                boolean isRevo)
     {
         boolean legal = false;
@@ -92,10 +106,12 @@ public class Rule implements Constant
         {
             return false;
         }
+        //System.out.println("type: " + playType + " " + lastType);
 
         int lastBiggest = lastValue[lastValue.length - 1];
         int playBiggest = playValue[playValue.length - 1];
 
+        //System.out.println("value: " + playBiggest + " " + lastBiggest);
         if (lastType == playType)
         {
             if (playBiggest > lastBiggest)
@@ -104,13 +120,16 @@ public class Rule implements Constant
             }
         }
 
-        if (playType == FOUR)
+        else if (playType == FOUR)
         {
-            if (playBiggest > lastBiggest)
-            {
-                legal = true;
-            }
+            legal = true;
         }
+        else
+        {
+            legal = false;
+        }
+        //System.out.println("legal: " + legal);
+        return (isRevo) ? (!legal) : legal;
     }
 
     /**
@@ -122,7 +141,7 @@ public class Rule implements Constant
      * @param  cards   a array of cards.
      * @return the toggled value in a int array.
      */
-    public int[] toggleValue(Card[] cards)
+    public static int[] toggleValue(Card[] cards)
     {
         int[] intArray = new int[cards.length];
         for (int i = 0; i < cards.length; ++i)
@@ -134,31 +153,31 @@ public class Rule implements Constant
     }
 
     /**
-     * Replace the ghost card by the vard that gives best value to 
+     * Replace the joker card by the vard that gives best value to 
      * the card combination.
      *
-     * @param cards the original card array with ghost card in it.
-     * @return a new card array which ghost has been replaced by 
+     * @param cards the original card array with joker card in it.
+     * @return a new card array which joker has been replaced by 
      *         another card.
      */
-    public Card[] replaceGhost(Card[] cards)
+    public Card[] replaceJoker(Card[] cards)
     {
         Card[] newCards = new Card[cards.length];
-        boolean hasGhost = false;
-        int ghostPos = -1;
+        boolean hasJoker = false;
+        int jokerPos = -1;
         int type;
         for (int i = 0; i < cards.length; ++i) 
         {
-            if (cards[i].getIndex == 53) 
+            if (cards[i].getIndex() == 53) 
             {
-                ghostPos = i;
-                hasGhost = true;
+                jokerPos = i;
+                hasJoker = true;
             }
         }
 
-        System.arraycopy(cards, 0, newCards, 0, cards.length)
+        System.arraycopy(cards, 0, newCards, 0, cards.length);
 
-        if (!hasGhost)
+        if (!hasJoker)
         {
             return newCards;
         }
@@ -168,13 +187,14 @@ public class Rule implements Constant
         {
             for (int i = 0; i < 52; ++ i)
             {
-                newCards[ghostPos] = new Card(i);
+                newCards[jokerPos] = new Card(i);
                 type = combination(newCards);
                 if (type == bestType){
                     return newCards;
                 }
             }
         }
+        return newCards;
     }
 
     /**
@@ -182,34 +202,71 @@ public class Rule implements Constant
      */
     public static void main(String[] args)
     {
-        // Chance are too low to generate some result.
-        Random ran = new Random();
-        int numExample = 5;
-        for (int length = 1; length <= 5; ++ length)
+        System.out.println("\n----------Test for Rule.java----------");
+        Card[] spades = new Card[13];
+        Card[] hearts = new Card[13];
+        Card[] diams  = new Card[13];
+        Card[] clubs  = new Card[13];
+        for (int i = 0; i<13; ++i)
         {
-            for (int time = 0; time < numExample; ++time)
-            {
-                Card[] cards = new Card[length];
-                for (int i = 0; i < length; ++i)
-                {
-                    cards[i] = new Card(ran.nextInt(52));
-                    //System.out.println(cards[i]);
-                }
-                //System.out.println("Result: " + combination(cards));
-            }
+            spades[i] = new Card(i);
+            hearts[i] = new Card(i+13);
+            diams[i]  = new Card(i+26);
+            clubs[i]  = new Card(i+39);
         }
 
-        Card[] a = new Card[] {new Card(0), new Card(13)};
-        Card[] b = new Card[] {new Card(0), new Card(1), new Card(2)};
-        Card[] c = new Card[] {new Card(0), new Card(13), new Card(26)};
-        Card[] d = new Card[] {new Card(0), new Card(1), new Card(2), new Card(3)};
-        Card[] e = new Card[] {new Card(4), new Card(5), new Card(6), new Card(7)};
+        Card[] two1   = new Card[] {spades[0], hearts[0]};
+        Card[] triple = new Card[] {spades[1], hearts[1], clubs[1]};
+        Card[] four   = new Card[] {spades[2], hearts[2], clubs[2], diams[2]};
+        Card[] straight34567 = new Card[] {spades[2], spades[3], spades[4], spades[5], spades[6]};
+        Card[] straight12345 = new Card[] {spades[0], spades[1], spades[2], spades[3], spades[4]};
+        Card[] straightJQK12 = new Card[] {spades[10], spades[11], spades[12], spades[0], spades[1]};
 
-        System.out.println("Test a:" + combination(a));
-        System.out.println("Test b:" + combination(b));
-        System.out.println("Test c:" + combination(c));
-        System.out.println("Test d:" + combination(d));
-        System.out.println("Test e:" + combination(e));
+        System.out.println("Combination test: ");
+        System.out.println("Test double: " + combination(two1));
+        System.out.println("Test triple: " + combination(triple));
+        System.out.println("Test four  : " + combination(four));
+        System.out.println("Test 34567 : " + combination(straight34567));
+        System.out.println("Test 12345 : " + combination(straight12345));
+        System.out.println("Test JQK12 : " + combination(straightJQK12));
 
+        System.out.println("\nisLegal play test:");
+        
+        Card[] two2    = new Card[] {spades[1], hearts[1]};
+        Card[] triple3 = new Card[] {spades[2], hearts[2], clubs[2]};
+        Card[] four4   = new Card[] {spades[3], hearts[3], clubs[3]};
+        Card[] straight45678 = new Card[] {spades[3], spades[4], spades[5], spades[6], spades[7]};
+        
+        Movement singleMove = new Movement(new Card[] {spades[0]});
+        Movement two1Move = new Movement(two1);
+        Movement two2Move = new Movement(two2);
+        Movement triple2Move = new Movement(triple);
+        Movement triple3Move = new Movement(triple3);
+        Movement four3Move = new Movement(four);
+        Movement four4Move = new Movement(four4);
+        Movement s34567Move = new Movement(straight34567);
+        Movement s45678Move = new Movement(straight45678);
+        Movement s12345Move = new Movement(straight12345);
+
+        System.out.println("Play 1     against 22     : " + isLegalMove(singleMove, two2Move, false));
+        System.out.println("Play 11    against 22     : " + isLegalMove(two1Move, two2Move, false));
+        System.out.println("Play 22    against 11     : " + isLegalMove(two2Move, two1Move, false));
+        System.out.println("Play 333   against 22     : " + isLegalMove(triple3Move, two2Move, false));
+        System.out.println("Play 333   against 222    : " + isLegalMove(triple3Move, triple2Move, false));
+        System.out.println("Play 3333  against 1      : " + isLegalMove(four3Move, singleMove, false));
+        System.out.println("Play 4444  against 333    : " + isLegalMove(four4Move, triple3Move, false));
+        System.out.println("Play 34567 against 45678  : " + isLegalMove(s34567Move, s45678Move, false));
+        System.out.println("Play 12345 against 45678  : " + isLegalMove(s12345Move, s45678Move, false));
+        System.out.println("");
     }
 }
+
+
+
+
+
+
+
+
+
+

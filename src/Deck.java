@@ -18,6 +18,7 @@ public class Deck
 		this.shuffle();
 		position = 0;
 	}
+	@Override
 	public String toString()
 	{
 		String s = new String();
@@ -38,6 +39,11 @@ public class Deck
 			cards[shuf] = hold;
 		}
 	}
+	/**
+	 * get the next card in the deck, or say in the Card[]
+	 * 
+	 * @return Card the next card in the deck, if there is no card in the deck, an exception will be thrown
+	 */
 	public Card getNext()
 
 	{

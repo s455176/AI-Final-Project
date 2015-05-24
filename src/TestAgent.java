@@ -12,6 +12,12 @@ public class TestAgent extends Agent
 		start = 0;
 		rn = new Random();
 	}
+	/**
+	 * Return a Movement decided by the agent base on the current situation
+	 * 
+	 * @param none
+	 * @return Movement the decided movement
+	 */
 	public Movement decideMove()
 	{
 		int num = player.numHandCards;

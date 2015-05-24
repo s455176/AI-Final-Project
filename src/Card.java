@@ -33,6 +33,7 @@ public class Card extends JLabel implements Comparable<Card>
 		this.suit = (index - 1) / 13;
 		this.rank = this.index - this.suit * 13;
 	}
+	@Override
 	public String toString()
 	{
 		String s = new String();

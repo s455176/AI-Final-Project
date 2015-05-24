@@ -8,7 +8,12 @@ public class Player
 	private TestAgent agent;
 	private int index;
 	
-	
+	/**
+	 * Constructor of the Player
+	 * 
+	 * @param game the game which player is playing 
+	 * @param index the index of the player in the game
+	 */
 	public Player(Game game, int index)
 	{
 		this.index = index;
@@ -17,6 +22,9 @@ public class Player
 		this.game = game;
 		agent = new TestAgent(this);
 	}
+	/** 
+	 * reset the player' s attribute
+	 */
 	public void reset()
 	{
 		for(int i = 0; i < Constant.numMaxHandCard; i++)
@@ -25,6 +33,11 @@ public class Player
 		}
 		numHandCards = 0;
 	}
+	/**
+	 * assign the card to the player, called by game.deal()
+	 * 
+	 * @param card the card assign to the player
+	 */
 	public void getCard(Card card)
 	{
 		if(numHandCards < Constant.numMaxHandCard)
@@ -33,10 +46,19 @@ public class Player
 			numHandCards++;
 		}
 	}
+	/**
+	 * sort the cards in the hand according to the cards' indexes
+	 */
 	public void sortHandCard()
 	{
 		Arrays.sort(hand, 0, numHandCards);
 	}
+	/**
+	 * the player will call this method to do the movement 
+	 * 
+	 * @param move the Movement will be done 
+	 * @return just return true
+	 */
 	public boolean doMove(Movement move)
 	{
 		// remove the cards in Movement from hand
@@ -58,6 +80,13 @@ public class Player
 		game.doMove(move, index);
 		return true;
 	}
+	/**
+	 * called by game.run() when it is the player' s turn, first call the agent to decide the movement, 
+	 * second call the doMove() to pass the movement, then sleep for a while just make sure that the window will
+	 * not change too fast, so I can see clearly what' s happening
+	 * 
+	 * @return just return true
+	 */
 	public boolean takeTurn()
 	{
 		System.out.println("myTurn");

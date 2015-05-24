@@ -12,6 +12,11 @@ public class GUIResource
 	public JLabel[][] cardBack;
 
 	// method 
+	/**
+	 * Constructor of the GUIResource
+	 *  
+	 * @param game the game which will request for the gui resource
+	 */
 	public GUIResource(Game game)
 	{
 		cardResource = new CardLabel[Constant.MAX_NUM_CARD];
@@ -35,18 +40,42 @@ public class GUIResource
 		}
 		this.game = game;
 	}
+	/**
+	 * set the location of the card of the index 
+	 * 
+	 * @param index the index of the card to be set
+	 * @param x the x coordinate to be set
+	 * @param y the y coordinate to be set 
+	 */
 	public void setCardLocation(int index, int x, int y)
 	{
 		cardResource[index].setLocation(x, y);
 	}
+	/**
+	 * set the owner of the card and its position in the player' s hand (actually the human player will use this function)
+	 * 
+	 * @param index the index of the card to be set
+	 * @param player the owner of the card
+	 * @param position the position in the player' s hand
+	 */
 	public void setPlayerAndPos(int index, int player, int position)
 	{
 		cardResource[index].setPlayerAndPos(player, position);
 	}
+	/**
+	 * to enable the key listener of the card
+	 * 
+	 * @param index the index of the card' s key listener will be enable 
+	 */
 	public void enableMouseListener(int index)
 	{
 		cardResource[index].enableMouseListener();
 	}
+	/**
+	 * to disable the key listener of the card
+	 * 
+	 * @param index the index of the card' s key listener will be disable
+	 */
 	public void disableMouseListener(int index)
 	{
 		cardResource[index].disableMouseListener();

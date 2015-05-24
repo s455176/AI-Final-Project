@@ -22,6 +22,9 @@ public class Game extends JPanel
 	private boolean player0Fin;
 	
 	// method 
+	/**
+	 * Constructor of the game
+	 */
 	public Game()
 	{
 		gui = new GUIResource(this);
@@ -63,6 +66,10 @@ public class Game extends JPanel
 		turn = 0;
 		deck.shuffle();
 	}
+	
+	/**
+	 * deal the cards to 4 players, and also need to draw the cards on the JPanel
+	 */
 	public void deal()
 	{
 		int turn = 0;
@@ -94,6 +101,14 @@ public class Game extends JPanel
 			drawBackCards(i, true);
 		}
 	}
+	/**
+	 * label the clicked card as chosen by the player and move up in the hand 
+	 * 
+	 * @param player which player is the human player that clicks the mouse, actually the player 0
+	 * @param position which card in the hand is clicked
+	 * @param index the index of the card (0~52, and 0 is the Joker)
+	 * @return check whether the clicking player is player 0
+	 */
 	public boolean playerClickCard(int player, int position, int index)
 	{
 		// actually for player 0
@@ -108,7 +123,13 @@ public class Game extends JPanel
 		}
 		else
 			return false;
-	}	
+	}
+	/**
+	 * help human player construct the Movement and call the doMove just like an agent will do 
+	 * 
+	 * @param player which player is the human player that press the Enter, actually the player 0
+	 * @return check whether the clicking player is player 0
+	 */
 	public boolean playerPressedEnter(int player)
 	{
 		// actually for player 0
@@ -134,10 +155,23 @@ public class Game extends JPanel
 		else
 			return false;
 	}
+	/**
+	 * not done yet
+	 * 
+	 * @param player which player is the human player that press the Pass, actually the player 0
+	 * @return check whether the clicking player is player 0
+	 */
 	public boolean playerPressedPass(int player)
 	{
 		return true;
 	}
+	/**
+	 * show the chosen card on the middle of the window, and if the player is not human player, 
+	 * it should decrease the covered cards in hand
+	 * 
+	 * @param move the movement done by the player 
+	 * @param playerIndex the index of the player who do the movements
+	 */
 	public void doMove(Movement move, int playerIndex)
 	{
 		if(playerIndex != 0)
@@ -149,7 +183,11 @@ public class Game extends JPanel
 		drawShowCards(move);
 		repaint();
 	}
-	
+	/**
+	 * show the movement card on the middle of the window, called by game.doMove()
+	 * 
+	 * @param move the movement done by the player 
+	 */
 	private void drawShowCards(Movement move)
 	{
 		if(showMove != null)
@@ -176,6 +214,12 @@ public class Game extends JPanel
 			System.out.println(c);
 		}
 	}
+	/**
+	 * draw the cards in the player' s hand, called by called by game.doMove()
+	 * 
+	 * @param playerIndex the index of player whose cards are drawn
+	 * @param isInit whether is called when dealing the card
+	 */
 	private void drawBackCards(int playerIndex, boolean isInit)
 	{
 		int index = playerIndex - 1;
@@ -207,7 +251,9 @@ public class Game extends JPanel
 		}
 	}
 	
-	// start the game begin from the players[turn] 
+	/**
+	 * start playing the game begin from the player whose index is "turn"
+	 */
 	public void run()
 	{
 		deal();
@@ -230,7 +276,9 @@ public class Game extends JPanel
 			turn = (turn + 1) % Constant.numPlayer;
 		}
 	}
-	
+	/**
+	 * wait the human player to choose the cards and press the key
+	 */
 	public void waitPlayer0()
 	{
 		// System.out.println("Sleep");
@@ -244,7 +292,8 @@ public class Game extends JPanel
 		    System.exit(-1);
 		}
 	}
-	
+
+	@Override
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
@@ -260,6 +309,7 @@ public class Game extends JPanel
 			isEnter = false;
 			isPass = false;
 		}
+		@Override
 		public void keyPressed(KeyEvent e)
 		{
 			int key = e.getKeyCode();
@@ -275,6 +325,7 @@ public class Game extends JPanel
 				player0Fin = true;
 			}
 		}
+		@Override
 		public void keyReleased(KeyEvent e)
 		{
 			int key = e.getKeyCode();

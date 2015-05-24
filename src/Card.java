@@ -64,7 +64,11 @@ public class Card extends JLabel implements Comparable<Card>
     }
     public int getValue()
     {
-        return (rank < 2) ? rank + 13 : rank;
+        if (rank == 0)
+        {
+            return 16;
+        }
+        return (rank < 3) ? rank + 13 : rank;
     }
     public int getIndex()
     {
@@ -80,7 +84,8 @@ public class Card extends JLabel implements Comparable<Card>
     }
 	public int compareTo(Card c)
 	{
-		return (this.index > c.index)? 1: -1;
+		//return (this.index > c.index)? 1: -1;
+        return (this.getValue() > c.getValue()) ? 1 : -1;
 	}
 }
 

@@ -30,7 +30,14 @@ public class Rule implements Constant
         for (int i = 0; i < length; ++i) 
         {
             int rank = cards[i].getRank();
-            values[i] = (rank < 2) ? rank + 13 : rank;
+            if (rank == 0) 
+            {
+                // It's joker, replace it with best choice card.
+                cards[i] = replaceJoker(cards, i);
+                rank = cards[i].getRank();
+            }
+            values[i] = (rank < 3) ? rank + 13 : rank;
+            
             if (cards[i].getSuit() != firstSuit)
             {
                 sameSuit = false;
@@ -39,6 +46,9 @@ public class Rule implements Constant
             {
                 sameRank = false;
             }
+        }
+        for (int i = 0; i < cards.length; ++i) {
+            //System.out.println("" + values[i]);
         }
 
         switch (length){
@@ -147,7 +157,12 @@ public class Rule implements Constant
         for (int i = 0; i < cards.length; ++i)
         {
             int value = cards[i].getRank();
-            intArray[i] = (value < 2) ? value + 13 : value;
+            if (value == 0)
+            {
+                cards[i] = replaceJoker(cards, i);
+                value = cards[i].getRank();
+            }
+            intArray[i] = (value < 3) ? value + 13 : value;
         }
         return intArray;
     }
@@ -160,41 +175,26 @@ public class Rule implements Constant
      * @return a new card array which joker has been replaced by 
      *         another card.
      */
-    public Card[] replaceJoker(Card[] cards)
+    public static Card replaceJoker(Card[] cards, int pos)
     {
         Card[] newCards = new Card[cards.length];
-        boolean hasJoker = false;
-        int jokerPos = -1;
         int type;
-        for (int i = 0; i < cards.length; ++i) 
-        {
-            if (cards[i].getIndex() == 53) 
-            {
-                jokerPos = i;
-                hasJoker = true;
-            }
-        }
 
         System.arraycopy(cards, 0, newCards, 0, cards.length);
-
-        if (!hasJoker)
-        {
-            return newCards;
-        }
         
-        //Check for straight
-        for (int bestType = 5; bestType > 0; --bestType)
+        //Brute force search for best replace card.
+        for (int bestType = 5; bestType > 1; --bestType)
         {
-            for (int i = 0; i < 52; ++ i)
+            for (int i = 53; i > 0; --i)
             {
-                newCards[jokerPos] = new Card(i);
+                newCards[pos] = new Card(i);
                 type = combination(newCards);
                 if (type == bestType){
-                    return newCards;
+                    return new Card(i);
                 }
             }
-        }
-        return newCards;
+        }        
+        return new Card(0);
     }
 
     /**
@@ -207,6 +207,7 @@ public class Rule implements Constant
         Card[] hearts = new Card[13];
         Card[] diams  = new Card[13];
         Card[] clubs  = new Card[13];
+        Card joker = new Card(0);
         for (int i = 0; i<13; ++i)
         {
             spades[i] = new Card(i + 1);
@@ -215,10 +216,10 @@ public class Rule implements Constant
             clubs[i]  = new Card(i + 40);
         }
 
-        Card[] two1   = new Card[] {spades[0], hearts[0]};
-        Card[] triple = new Card[] {spades[1], hearts[1], clubs[1]};
-        Card[] four   = new Card[] {spades[2], hearts[2], clubs[2], diams[2]};
-        Card[] straight34567 = new Card[] {spades[2], spades[3], spades[4], spades[5], spades[6]};
+        Card[] two1   = new Card[] {spades[3], joker};
+        Card[] triple = new Card[] {spades[1], joker, clubs[1]};
+        Card[] four   = new Card[] {spades[2], hearts[2], joker, diams[2]};
+        Card[] straight34567 = new Card[] {spades[2], joker, spades[4], spades[5], spades[6]};
         Card[] straight12345 = new Card[] {spades[0], spades[1], spades[2], spades[3], spades[4]};
         Card[] straightJQK12 = new Card[] {spades[10], spades[11], spades[12], spades[0], spades[1]};
 

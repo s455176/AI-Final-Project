@@ -53,38 +53,38 @@ public class Rule implements Constant
 
         switch (length){
 
-            case SINGLE:
+            case 1:
                 return SINGLE;
 
-            case PAIR:
+            case 2:
                 if (sameRank)
                     return PAIR;
                 return ILLEGAL;
 
-            case TRIPLE:
+            case 3:
                 if (sameRank) 
                     return TRIPLE;
                 if ((values[0] == values[1] - 1) &&
                     (values[0] == values[2] - 2) &&
                     sameSuit )
-                    return STRAIGHT;
+                    return STRAIGHT3;
 
-           case FOUR:
+           case 4:
                 if (sameRank) 
                     return FOUR;
                 if ((values[0] == values[1] - 1) &&
                     (values[0] == values[2] - 2) &&
                     (values[0] == values[3] - 3) &&
                     sameSuit )
-                    return STRAIGHT;
+                    return STRAIGHT4;
 
-            case STRAIGHT:
+            case 5:
                 if (sameSuit &&
                     (values[0] == values[1] - 1) &&
                     (values[0] == values[2] - 2) &&
                     (values[0] == values[3] - 3) &&
                     (values[0] == values[4] - 4) )
-                    return STRAIGHT;
+                    return STRAIGHT5;
 
             default:
                 return ILLEGAL;
@@ -178,17 +178,15 @@ public class Rule implements Constant
     public static Card replaceJoker(Card[] cards, int pos)
     {
         Card[] newCards = new Card[cards.length];
-        int type;
-
         System.arraycopy(cards, 0, newCards, 0, cards.length);
         
         //Brute force search for best replace card.
-        for (int bestType = 5; bestType > 1; --bestType)
+        for (int bestType = 7; bestType > 1; --bestType)
         {
             for (int i = 53; i > 0; --i)
             {
                 newCards[pos] = new Card(i);
-                type = combination(newCards);
+                int type = combination(newCards);
                 if (type == bestType){
                     return new Card(i);
                 }

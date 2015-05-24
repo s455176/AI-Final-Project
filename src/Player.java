@@ -2,15 +2,26 @@ import java.util.Arrays;
 
 public class Player 
 {
-	private Card[] hand;
-	private int numHandCards;
+	public Card[] hand;
+	public int numHandCards;
 	private Game game;
+	private TestAgent agent;
+	
 	
 	public Player(Game game)
 	{
 		hand = new Card[Constant.numMaxHandCard];
-		numHandCards = 0;
+		reset();
 		this.game = game;
+		agent = new TestAgent(this);
+	}
+	public void reset()
+	{
+		for(int i = 0; i < Constant.numMaxHandCard; i++)
+		{
+			hand[i] = null;
+		}
+		numHandCards = 0;
 	}
 	public void getCard(Card card)
 	{
@@ -27,7 +38,38 @@ public class Player
 	public boolean doMove(Movement move)
 	{
 		// remove the cards in Movement from hand
+		for(int i = 0; i < Constant.numMaxHandCard; i++)
+		{
+			if(hand[i] == null) continue;
+			
+			// hand[i] != null
+			for(int j = 0; j < move.numCards; j++)
+			{
+				if(hand[i].index == move.cards[j].index)
+				{
+					hand[i] = null;
+					numHandCards--;
+					break;
+				}
+			}
+		}
 		game.doMove(move);
+		return true;
+	}
+	public boolean takeTurn()
+	{
+		System.out.println("myTurn");
+		Movement move = agent.decideMove();
+		doMove(move);
+		try
+		{
+		    Thread.sleep(1000);
+		}
+		catch (InterruptedException e)
+		{
+		    e.printStackTrace();
+		    System.exit(-1);
+		}
 		return true;
 	}
 }

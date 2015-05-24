@@ -5,7 +5,7 @@ public class Deck
 {
 	// attribute
 	private Card[] cards  = new Card[Constant.MAX_NUM_CARD];
-	Random rn = new Random();
+	private Random rn = new Random();
 	private int position;
 	
 	// method

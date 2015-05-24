@@ -2,9 +2,11 @@ import javax.swing.*;;
 
 public class MainFrame extends JFrame
 {
+	public Game game;
 	public MainFrame()
 	{
-		add(new Game());
+		game = new Game();
+		add(game);
         setSize(Constant.width, Constant.height);
         setTitle("AI_FINAL");
         setResizable(false);
@@ -12,6 +14,7 @@ public class MainFrame extends JFrame
 	}
 	public static void main(String[] args)
 	{
-		new MainFrame();
+		MainFrame mainFrame = new MainFrame();
+		mainFrame.game.run();
 	}
 }

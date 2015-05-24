@@ -11,12 +11,16 @@ public class Game extends JPanel
 	private Player[] players; // player 0 is the human player
 	private Deck deck;
 	private GUIResource gui;
+	private KeyController keyController;
 	private Movement showMove;
+	private boolean isEnd;
+	private int turn;
 	
 	// for player 0
 	private Card[] player0Hand;
 	private boolean[] choose;
 	private int numChoose;
+	private boolean player0Fin;
 	
 	// method 
 	public Game()
@@ -24,7 +28,7 @@ public class Game extends JPanel
 		gui = new GUIResource(this);
 		setFocusable(true);
 		setLayout(null);
-		addKeyListener(new KeyController());
+		keyController = new KeyController();
 		
 		players = new Player[Constant.numPlayer];
 		deck = new Deck();
@@ -39,8 +43,27 @@ public class Game extends JPanel
 		{
 			choose[i] = false;
 		}
+		player0Fin = false;
 		showMove = null;
-		// deal();
+		isEnd = false;
+		turn = 0;
+	}
+	public void reset()
+	{
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			players[i].reset();
+		}
+		numChoose = 0;
+		for(int i = 0; i < Constant.numMaxHandCard; i++)
+		{
+			choose[i] = false;
+		}
+		player0Fin = false;
+		showMove = null;
+		isEnd = false;
+		turn = 0;
+		deck.shuffle();
 	}
 	public void deal()
 	{
@@ -149,7 +172,41 @@ public class Game extends JPanel
 	
 	// run the game
 	public void run()
-	{}
+	{
+		deal();
+		while(!isEnd)
+		{
+			if(turn == 0)
+			{
+				addKeyListener(keyController);
+				while(!player0Fin)
+				{
+					waitPlayer0();
+				}
+				removeKeyListener(keyController);
+				player0Fin = false;
+			}
+			else
+			{
+				players[turn].takeTurn();
+			}
+			turn = (turn + 1) % Constant.numPlayer;
+		}
+	}
+	
+	public void waitPlayer0()
+	{
+		// System.out.println("Sleep");
+		try
+		{
+		    Thread.sleep(1000);
+		}
+		catch (InterruptedException e)
+		{
+		    e.printStackTrace();
+		    System.exit(-1);
+		}
+	}
 	
 	public void paintComponent(Graphics g)
 	{
@@ -159,10 +216,12 @@ public class Game extends JPanel
 	private class KeyController extends KeyAdapter
 	{
 		boolean isEnter;
+		boolean isPass;
 		public KeyController()
 		{
 			super();
 			isEnter = false;
+			isPass = false;
 		}
 		public void keyPressed(KeyEvent e)
 		{
@@ -171,6 +230,12 @@ public class Game extends JPanel
 			{
 				isEnter = true;
 				playerPressedEnter(0);
+				player0Fin = true;
+			}
+			if(key == KeyEvent.VK_P && !isPass)
+			{
+				isPass = true;
+				player0Fin = true;
 			}
 		}
 		public void keyReleased(KeyEvent e)
@@ -179,6 +244,10 @@ public class Game extends JPanel
 			if(key == KeyEvent.VK_ENTER && isEnter)
 			{
 				isEnter = false;
+			}
+			else if(key == KeyEvent.VK_P && isPass)
+			{
+				isPass = false;
 			}
 		}
 	}

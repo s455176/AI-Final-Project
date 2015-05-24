@@ -23,15 +23,15 @@ public class Card extends JLabel implements Comparable<Card>
 		else
 		{
 			this.suit = suit;
-			this.rank = rank - 1;
-			this.index = rank * 13 + suit + 1;
+			this.rank = rank;
+			this.index = rank + suit * 13;
 		}
 	}
 	public Card(int index)
 	{
 		this.index = index;
-		this.rank = index % 13;
-		this.suit = index / 13;
+		this.suit = (index - 1) / 13;
+		this.rank = this.index - this.suit * 13;
 	}
 	public String toString()
 	{
@@ -51,7 +51,7 @@ public class Card extends JLabel implements Comparable<Card>
 			s = "SPADE";
 			break;
 		}
-		return "Suit: " + s +  ", " + "Rank: " + (this.rank + 1);
+		return "Suit: " + s + ", Rank: " + this.rank + ", Index:" + this.index;
 	}
 	public int compareTo(Card c)
 	{

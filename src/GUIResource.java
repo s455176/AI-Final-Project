@@ -9,6 +9,7 @@ public class GUIResource
 	public CardLabel[] cardResource;
 	public Image background;
 	private Game game;
+	public JLabel[][] cardBack;
 
 	// method 
 	public GUIResource(Game game)
@@ -21,6 +22,17 @@ public class GUIResource
 		}
 		ImageIcon bg_ii = new ImageIcon(this.getClass().getResource("images/background.jpg"));
 		background = bg_ii.getImage();
+		cardBack = new JLabel[Constant.numPlayer - 1][Constant.numMaxHandCard];
+		for(int i = 0; i < Constant.numPlayer - 1; i++)
+		{
+			for(int j = 0; j < Constant.numMaxHandCard; j++)
+			{
+				if(i % 2 == 0)
+					cardBack[i][j] = new JLabel(new ImageIcon(this.getClass().getResource("images/cards/back_horizontal.gif")));
+				else
+					cardBack[i][j] = new JLabel(new ImageIcon(this.getClass().getResource("images/cards/back_vertical.gif")));
+			}
+		}
 		this.game = game;
 	}
 	public void setCardLocation(int index, int x, int y)

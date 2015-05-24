@@ -6,10 +6,12 @@ public class Player
 	public int numHandCards;
 	private Game game;
 	private TestAgent agent;
+	private int index;
 	
 	
-	public Player(Game game)
+	public Player(Game game, int index)
 	{
+		this.index = index;
 		hand = new Card[Constant.numMaxHandCard];
 		reset();
 		this.game = game;
@@ -53,7 +55,7 @@ public class Player
 				}
 			}
 		}
-		game.doMove(move);
+		game.doMove(move, index);
 		return true;
 	}
 	public boolean takeTurn()

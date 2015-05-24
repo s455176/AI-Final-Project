@@ -17,7 +17,6 @@ public class Game extends JPanel
 	private int turn;
 	
 	// for player 0
-	private Card[] player0Hand;
 	private boolean[] choose;
 	private int numChoose;
 	private boolean player0Fin;
@@ -34,9 +33,8 @@ public class Game extends JPanel
 		deck = new Deck();
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
-			players[i] = new Player(this);
+			players[i] = new Player(this, i);
 		}
-		player0Hand = new Card[Constant.numMaxHandCard];
 		choose = new boolean[Constant.numMaxHandCard];
 		numChoose = 0;
 		for(int i = 0; i < Constant.numMaxHandCard; i++)
@@ -68,35 +66,32 @@ public class Game extends JPanel
 	public void deal()
 	{
 		int turn = 0;
-		int count = 0;
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{
 			Card c = deck.getNext();
-			// record player0's cards to add them to JPanel, and open the mouseListener
-			if(turn == 0)
-			{
-				player0Hand[count++] = c;
-			}
-			else
-				players[turn].getCard(c);
+			players[turn].getCard(c);
 			turn = (turn + 1) % 4;
 		}
-		Arrays.sort(player0Hand, 0, count);
-		for(int i = 1; i < Constant.numPlayer; i++)
+		for(int i = 0; i < Constant.numPlayer; i++)
 		{
 			players[i].sortHandCard();
 		}
 		
-		// show player0' s cards on the window
-		for(int i = 0; i < count; i++)
+		// show player 0' s cards on the window
+		for(int i = 0; i < players[0].numHandCards; i++)
 		{
-			int index = player0Hand[i].index;
-			players[0].getCard(player0Hand[i]);
+			int index = players[0].hand[i].index;
 			choose[i] = false;
 			gui.setPlayerAndPos(index, 0, i);
 			gui.setCardLocation(index, Constant.playerCardLocationX[i], Constant.playerCardLocationY[0]);
 			add(gui.cardResource[index], 0);
 			gui.enableMouseListener(index);
+		}
+		
+		// show player 1~3 's back cards on the window
+		for(int i = 1; i <= 3; i++)
+		{
+			drawBackCards(i, true);
 		}
 	}
 	public boolean playerClickCard(int player, int position, int index)
@@ -128,7 +123,7 @@ public class Game extends JPanel
 				if(choose[i])
 				{
 					choose[i] = false;
-					chosenCard[j++] = player0Hand[i];
+					chosenCard[j++] = players[player].hand[i];
 				}
 			}
 			Movement move = new Movement(chosenCard);
@@ -143,7 +138,19 @@ public class Game extends JPanel
 	{
 		return true;
 	}
-	public void doMove(Movement move)
+	public void doMove(Movement move, int playerIndex)
+	{
+		if(playerIndex != 0)
+		{
+			// draw the back of cards
+			drawBackCards(playerIndex, false);
+		}
+		// draw the cards show in the middle
+		drawShowCards(move);
+		repaint();
+	}
+	
+	private void drawShowCards(Movement move)
 	{
 		if(showMove != null)
 		{
@@ -166,11 +173,41 @@ public class Game extends JPanel
 					Constant.showLocationY);
 			gui.disableMouseListener(c.index);
 			add(gui.cardResource[c.index], 0);
+			System.out.println(c);
 		}
-		repaint();
+	}
+	private void drawBackCards(int playerIndex, boolean isInit)
+	{
+		int index = playerIndex - 1;
+		if(isInit)
+		{
+			int width = (playerIndex % 2 == 0)? Constant.cardWidth: Constant.cardHeight;
+			int height = (playerIndex % 2 == 0)? Constant.cardHeight: Constant.cardWidth;
+			for(int i = 0; i < Constant.numMaxHandCard; i++)
+			{
+				if(i < players[playerIndex].numHandCards)
+				{
+					int x = (playerIndex % 2 == 0)? 
+							Constant.playerCardBack[index][0] + (i + 1) * Constant.playerCardBack[index][1] / players[playerIndex].numHandCards:
+							Constant.playerCardBack[index][2];
+					int y = (playerIndex % 2 == 1)? 
+							Constant.playerCardBack[index][0] + (i + 1) * Constant.playerCardBack[index][1] / players[playerIndex].numHandCards:
+							Constant.playerCardBack[index][2];
+					gui.cardBack[index][i].setBounds(x, y, width, height);
+					add(gui.cardBack[index][i], 0);
+				}
+			}
+		}
+		else
+		{
+			for(int i = players[playerIndex].numHandCards; i < Constant.numMaxHandCard; i++)
+			{
+				remove(gui.cardBack[index][i]);
+			}
+		}
 	}
 	
-	// run the game
+	// start the game begin from the players[turn] 
 	public void run()
 	{
 		deal();

@@ -209,10 +209,10 @@ public class Rule implements Constant
         Card[] clubs  = new Card[13];
         for (int i = 0; i<13; ++i)
         {
-            spades[i] = new Card(i);
-            hearts[i] = new Card(i+13);
-            diams[i]  = new Card(i+26);
-            clubs[i]  = new Card(i+39);
+            spades[i] = new Card(i + 1);
+            hearts[i] = new Card(i + 14);
+            diams[i]  = new Card(i + 27);
+            clubs[i]  = new Card(i + 40);
         }
 
         Card[] two1   = new Card[] {spades[0], hearts[0]};

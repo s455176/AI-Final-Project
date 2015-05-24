@@ -22,7 +22,7 @@ public class Movement
 		}
 		else
 		{
-			this.cards = new Card[Constant.maxMovementCard];
+			this.cards = new Card[cards.length];
 			this.numCards = cards.length;
 			for(int i = 0; i < numCards; i++)
 			{
@@ -30,4 +30,10 @@ public class Movement
 			}
 		}
 	}
+	public Card[] getCards()
+    {
+        Card[] copyArray = new Card[cards.length];
+        System.arraycopy(cards, 0, copyArray, 0, cards.length);
+        return copyArray;
+    }
 }

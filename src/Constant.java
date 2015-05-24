@@ -32,4 +32,12 @@ public interface Constant
 	    
 	    static final int[][] playerCardBack = new int[][] {{0, 420, 900}, 
 	    	{280, 420, 30}, {0, 420, 50}}; // 0~1 are start and range, 2 is the fixed position
+	    
+	    // Different combinations of cards
+        static final int ILLEGAL  = 0;
+        static final int SINGLE   = 1;
+        static final int PAIR     = 2;
+        static final int TRIPLE   = 3;
+        static final int FOUR     = 4;
+        static final int STRAIGHT = 5;
 }

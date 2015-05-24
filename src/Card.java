@@ -53,6 +53,30 @@ public class Card extends JLabel implements Comparable<Card>
 		}
 		return "Suit: " + s + ", Rank: " + this.rank + ", Index:" + this.index;
 	}
+	public int getSuit()
+    {
+        return suit;
+    }
+    public int getRank()
+    {
+        return rank;
+    }
+    public int getValue()
+    {
+        return (rank < 2) ? rank + 13 : rank;
+    }
+    public int getIndex()
+    {
+    	return index;
+    }
+    public boolean hasSameRank(Card c)
+    {
+        return (this.rank == c.rank) ? true : false;
+    }
+    public boolean hasSameSuit(Card c)
+    {
+        return (this.suit == c.suit) ? true : false;
+    }
 	public int compareTo(Card c)
 	{
 		return (this.index > c.index)? 1: -1;

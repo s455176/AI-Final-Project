@@ -1,102 +1,61 @@
 import javax.swing.*;
-import java.awt.*;
 
-public class Card implements Constant, Comparable<Card>
+import java.awt.*;
+import java.awt.event.*;
+
+public class Card extends JLabel implements Comparable<Card>
 {
 	// attribute
-	private int suit;
-	private int rank;
-	private int index;
-	private Image graphic;
-	private ImageIcon ii;
+	public int suit;
+	public int rank;
+	public int index;
 	
 	// method 
-	public Card()
-	{}
+	public Card() {}
 	public Card(int suit, int rank)
 	{
-		this.suit = suit;
-		this.rank = rank - 1;
-		this.index = rank * 13 + suit + 1;
-		ii = new ImageIcon(this.getClass().getResource(Card.filePrefix +  
-				this.index + ".gif"));
-		graphic = ii.getImage();
+		if(suit == 0 && rank == 0)
+		{
+			this.suit = 0;
+			this.rank = 0;
+			this.index = 0;
+		}
+		else
+		{
+			this.suit = suit;
+			this.rank = rank - 1;
+			this.index = rank * 13 + suit + 1;
+		}
 	}
 	public Card(int index)
 	{
-		this.index = index + 1;
+		this.index = index;
 		this.rank = index % 13;
 		this.suit = index / 13;
-		ii = new ImageIcon(this.getClass().getResource(Card.filePrefix + 
-				this.index + ".gif"));
-		graphic = ii.getImage();
 	}
 	public String toString()
 	{
 		String s = new String();
 		switch(suit)
 		{
-		case DIAMOND:
+		case Constant.DIAMOND:
 			s = "DIAMOND";
 			break;
-		case CLUB:
+		case Constant.CLUB:
 			s = "CLUB";
 			break;
-		case HEART:
+		case Constant.HEART:
 			s = "HEART";
 			break;
-		case SPADE:
+		case Constant.SPADE:
 			s = "SPADE";
 			break;
 		}
 		return "Suit: " + s +  ", " + "Rank: " + (this.rank + 1);
 	}
-	public Image getImage()
-	{
-		return graphic;
-	}
-	public ImageIcon getIcon()
-	{
-		return ii;
-	}
 	public int compareTo(Card c)
 	{
-		return (this.index > c.index)? 1: 0;
-	}
-	public int getIndex()
-	{
-		return index;
-	}
-    public int getSuit()
-    {
-        return suit;
-    }
-    public int getRank()
-    {
-        return rank;
-    }
-    public int getValue()
-    {
-        return (rank < 2) ? rank + 13 : rank;
-    }
-
-    public boolean hasSameRank(Card c)
-    {
-        return (this.rank == c.rank) ? true : false;
-    }
-    public boolean hasSameSuit(Card c)
-    {
-        return (this.suit == c.suit) ? true : false;
-    }
-	
-	// unit test 
-	public static void main(String[] args)
-	{
-		Card c = new Card(1, Card.DIAMOND);
-        Card d = new Card(1, Card.DIAMOND);
-        System.out.println(c.hasSameRank(d));
-        System.out.println(c.hasSameSuit(d));
-		System.out.println(c);
+		return (this.index > c.index)? 1: -1;
 	}
 }
 

@@ -4,7 +4,7 @@ public class MainFrame extends JFrame
 {
 	public MainFrame()
 	{
-		add(new Board());
+		add(new Game());
         setSize(Constant.width, Constant.height);
         setTitle("AI_FINAL");
         setResizable(false);

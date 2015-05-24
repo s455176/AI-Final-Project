@@ -76,8 +76,8 @@ public class Board extends JPanel
 					if(choose[i] == 1)
 					{
 						count++;
-						cardLabel[i].setBounds(Constant.handLocationX0 + count * Constant.handLocationDX / (numChoose + 1), 
-								Constant.handLocationY,  
+						cardLabel[i].setBounds(Constant.showLocationX0 + count * Constant.showLocationDX / (numChoose + 1), 
+								Constant.showLocationY,  
 			        			Constant.cardWidth, Constant.cardHeight);
 						cardLabel[i].disableMouseListener();
 						choose[i] = 2;
@@ -132,8 +132,7 @@ public class Board extends JPanel
 		}
 		public int compareTo(CardLabel c)
 		{
-			//return (this.card.getIndex() > c.card.getIndex())? 1: -1;
-            return (this.card.getValue() > c.card.getValue()) ? 1 : -1;
+			return (this.card.index > c.card.index)? 1: -1;
 		}
 	}
 }

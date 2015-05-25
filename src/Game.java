@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.PrintStream;
 import java.util.Arrays;
 
 public class Game extends JPanel
@@ -13,8 +14,8 @@ public class Game extends JPanel
 	private GUIResource gui;
 	private KeyController keyController;
 	private Movement showMove;
-	private boolean isEnd;
-	private int turn;
+	private boolean isGameEnd, isRoundEnd;
+	public boolean[] isPlayerPassed;
 	
 	// for player 0
 	private boolean[] choose;
@@ -33,10 +34,12 @@ public class Game extends JPanel
 		keyController = new KeyController();
 		
 		players = new Player[Constant.numPlayer];
+		isPlayerPassed = new boolean[Constant.numPlayer];
 		deck = new Deck();
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
 			players[i] = new Player(this, i);
+			isPlayerPassed[i] = false;
 		}
 		choose = new boolean[Constant.numMaxHandCard];
 		numChoose = 0;
@@ -46,14 +49,15 @@ public class Game extends JPanel
 		}
 		player0Fin = false;
 		showMove = null;
-		isEnd = false;
-		turn = 0;
+		isGameEnd = false;
+		isRoundEnd = false;
 	}
 	public void reset()
 	{
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
 			players[i].reset();
+			isPlayerPassed[i] = false;
 		}
 		numChoose = 0;
 		for(int i = 0; i < Constant.numMaxHandCard; i++)
@@ -62,8 +66,8 @@ public class Game extends JPanel
 		}
 		player0Fin = false;
 		showMove = null;
-		isEnd = false;
-		turn = 0;
+		isGameEnd = false;
+		isRoundEnd = false;
 		deck.shuffle();
 	}
 	
@@ -94,11 +98,15 @@ public class Game extends JPanel
 			add(gui.cardResource[index], 0);
 			gui.enableMouseListener(index);
 		}
-		
 		// show player 1~3 's back cards on the window
 		for(int i = 1; i <= 3; i++)
 		{
 			drawBackCards(i, true);
+		}
+		// all players are not pass at first
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			remove(gui.passLabel[i]);
 		}
 	}
 	/**
@@ -150,6 +158,7 @@ public class Game extends JPanel
 			Movement move = new Movement(chosenCard);
 			// players[0].doMove();
 			players[player].doMove(move);
+			SystemFunc.sleep(1000);
 			return true;
 		}
 		else
@@ -163,7 +172,15 @@ public class Game extends JPanel
 	 */
 	public boolean playerPressedPass(int player)
 	{
-		return true;
+		if(player == 0)
+		{
+			Card[] pass = new Card[0];
+			Movement passMovement = new Movement(pass);
+			players[player].doMove(passMovement);
+			return true;
+		}
+		else
+			return false;
 	}
 	/**
 	 * show the chosen card on the middle of the window, and if the player is not human player, 
@@ -174,15 +191,43 @@ public class Game extends JPanel
 	 */
 	public void doMove(Movement move, int playerIndex)
 	{
-		if(playerIndex != 0)
+		// move with 0 cards means player do the "pass" movement
+		if(move.numCards == 0) 
 		{
-			// draw the back of cards
-			drawBackCards(playerIndex, false);
+			// draw passed label of the correspondent player
+			drawPlayerPass(playerIndex);
+			isPlayerPassed[playerIndex] = true;
 		}
-		// draw the cards show in the middle
-		drawShowCards(move);
+		else
+		{
+			if(playerIndex != 0)
+			{
+				// draw the back of cards
+				drawBackCards(playerIndex, false);
+			}
+			// draw the cards show in the middle
+			drawShowCards(move);
+			resetPass();
+		}
 		repaint();
 	}
+	private void drawPlayerPass(int playerIndex)
+	{
+		System.out.println("player pass");
+		add(gui.passLabel[playerIndex], 0);
+	}
+	
+	private void removeShowCards()
+	{
+		for(int i = 0; i < showMove.numCards; i++)
+		{
+			Card c = showMove.cards[i];
+			remove(gui.cardResource[c.index]);
+			showMove.cards[i] = null;
+		}
+		showMove.numCards = 0;
+	}
+	
 	/**
 	 * show the movement card on the middle of the window, called by game.doMove()
 	 * 
@@ -192,13 +237,7 @@ public class Game extends JPanel
 	{
 		if(showMove != null)
 		{
-			for(int i = 0; i < showMove.numCards; i++)
-			{
-				Card c = showMove.cards[i];
-				remove(gui.cardResource[c.index]);
-				showMove.cards[i] = null;
-			}
-			showMove.numCards = 0;
+			removeShowCards();
 		}
 		int count = 0;
 		showMove = move;
@@ -211,7 +250,7 @@ public class Game extends JPanel
 					Constant.showLocationY);
 			gui.disableMouseListener(c.index);
 			add(gui.cardResource[c.index], 0);
-			System.out.println(c);
+			// System.out.println(c);
 		}
 	}
 	/**
@@ -256,9 +295,100 @@ public class Game extends JPanel
 	 */
 	public void run()
 	{
+		int turn = 0;
 		deal();
-		while(!isEnd)
+		while(!isGameEnd)
 		{
+			turn = runRound(turn);
+			System.out.println("========Round end");
+			// remove the show cards in the middle and repaint the panel
+			removeShowCards();
+			repaint();
+			SystemFunc.sleep(2000);
+			if(numRemainPlayer() == 1)
+			{
+				isGameEnd = true;
+				break;
+			}
+			if(turn == -1)
+			{
+				SystemFunc.throwException("Error: turn == -1");
+			}
+		}
+		System.out.println("========Game end");
+	}
+	/**
+	 * wait the human player to choose the cards and press the key
+	 */
+	public void waitPlayer0()
+	{
+		// System.out.println("Sleep");
+		SystemFunc.sleep(1000);
+	}
+
+	public void resetPass()
+	{
+		// remove all the pass label
+		// set all player pass boolean to false
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			remove(gui.passLabel[i]);
+			isPlayerPassed[i] = false;
+		}
+	}
+	private int numRemainPlayer()
+	{
+		int count = 0;
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			if(!players[i].isFinish())
+				count++;
+		}
+		return count;
+	}
+	
+	
+	private int findNextPlayerWithHandCards(int cur)
+	{
+		int nextStartTurn = -1;
+		int i = (cur + 1) % Constant.numPlayer;
+		while(i != cur)
+		{
+			if(!players[i].isFinish())
+			{
+				nextStartTurn = i;
+				break;
+			}
+			i = (i + 1) % Constant.numPlayer;
+		}
+		return nextStartTurn;
+	}
+	
+	public int runRound(int initTurn)
+	{
+		// init the round
+		int passCount = 0;
+		int turn = initTurn; /*note that the player who is the first player in the round is not allowed to pass*/
+		int nextRoundStart = -1;
+		isRoundEnd = false;
+		
+		// start the round 
+		while(!isRoundEnd)
+		{
+			if(players[turn].isFinish())
+			{
+				turn = (turn + 1) % Constant.numPlayer;
+				continue;
+			}
+			// all other players pass
+			if(passCount == numRemainPlayer() - 1)
+			{
+				isRoundEnd = true;
+				nextRoundStart = turn;
+				break;
+			}
+			// player decide a movement
+			System.out.println("turn " + turn);
 			if(turn == 0)
 			{
 				addKeyListener(keyController);
@@ -273,26 +403,23 @@ public class Game extends JPanel
 			{
 				players[turn].takeTurn();
 			}
+			// after player do a moment
+			if(!isPlayerPassed[turn] && players[turn].isFinish())
+			{
+				// a player has no hand cards after do a non-pass movement (ie, this player finishes)
+				isRoundEnd = true;
+				nextRoundStart = findNextPlayerWithHandCards(turn);
+				break;
+			}
+			if(isPlayerPassed[turn])
+				passCount++;
+			else
+				passCount = 0;
 			turn = (turn + 1) % Constant.numPlayer;
 		}
+		return nextRoundStart;
 	}
-	/**
-	 * wait the human player to choose the cards and press the key
-	 */
-	public void waitPlayer0()
-	{
-		// System.out.println("Sleep");
-		try
-		{
-		    Thread.sleep(1000);
-		}
-		catch (InterruptedException e)
-		{
-		    e.printStackTrace();
-		    System.exit(-1);
-		}
-	}
-
+	
 	@Override
 	public void paintComponent(Graphics g)
 	{
@@ -322,6 +449,7 @@ public class Game extends JPanel
 			if(key == KeyEvent.VK_P && !isPass)
 			{
 				isPass = true;
+				playerPressedPass(0);
 				player0Fin = true;
 			}
 		}

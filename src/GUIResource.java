@@ -10,6 +10,7 @@ public class GUIResource
 	public Image background;
 	private Game game;
 	public JLabel[][] cardBack;
+	public JLabel[] passLabel;
 
 	// method 
 	/**
@@ -37,6 +38,16 @@ public class GUIResource
 				else
 					cardBack[i][j] = new JLabel(new ImageIcon(this.getClass().getResource("images/cards/back_vertical.gif")));
 			}
+		}
+		passLabel = new JLabel[Constant.numPlayer];
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			Font font = new Font("Verdana", Font.BOLD, 26);
+			passLabel[i] = new JLabel("Pass!");
+			passLabel[i].setSize(Constant.passLabelWidth, Constant.passLabelHeight);
+			passLabel[i].setFont(font);
+			passLabel[i].setForeground(Color.yellow);
+			passLabel[i].setLocation(Constant.playerPassLabel[i][0], Constant.playerPassLabel[i][1]);
 		}
 		this.game = game;
 	}

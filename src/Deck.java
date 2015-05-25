@@ -53,15 +53,7 @@ public class Deck
 		}
 		else
 		{
-			try
-			{
-				throw new Exception("No cards availible");
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace(new PrintStream(System.err));
-				System.exit(-1);
-			}
+			SystemFunc.throwException("No cards availible");
 			return new Card();
 		}
 	}

@@ -32,6 +32,9 @@ public interface Constant
 	    
 	    static final int[][] playerCardBack = new int[][] {{0, 420, 900}, 
 	    	{280, 420, 30}, {0, 420, 50}}; // 0~1 are start and range, 2 is the fixed position
+	    static final int[][] playerPassLabel = new int[][] {{450, 350}, {800, 210}, {450, 120}, {180, 210}};
+	    static final int passLabelWidth = 100;
+	    static final int passLabelHeight = 80;
 	    
 	    // Different combinations of cards
         static final int ILLEGAL   = 0;

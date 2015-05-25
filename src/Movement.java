@@ -15,15 +15,7 @@ public class Movement
 		{
 			cards = null;
 			numCards = 0;
-			try
-			{
-				throw new Exception("Invalid Movement");
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace(new PrintStream(System.err));
-				System.exit(-1);
-			}
+			SystemFunc.throwException("Invalid Movement");
 		}
 		else
 		{

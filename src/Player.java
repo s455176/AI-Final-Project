@@ -89,18 +89,14 @@ public class Player
 	 */
 	public boolean takeTurn()
 	{
-		System.out.println("myTurn");
+		//System.out.println("myTurn " + index);
 		Movement move = agent.decideMove();
 		doMove(move);
-		try
-		{
-		    Thread.sleep(1000);
-		}
-		catch (InterruptedException e)
-		{
-		    e.printStackTrace();
-		    System.exit(-1);
-		}
+		SystemFunc.sleep(1000);
 		return true;
+	}
+	public boolean isFinish()
+	{
+		return numHandCards == 0;
 	}
 }

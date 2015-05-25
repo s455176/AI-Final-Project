@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.event.*;
 
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
@@ -6,9 +7,10 @@ import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-public class Game extends JPanel
+public class Game extends JPanel implements ActionListener
 {
 	// attribute
+	private Timer timer;
 	private Player[] players; // player 0 is the human player
 	private Deck deck;
 	private GUIResource gui;
@@ -51,6 +53,8 @@ public class Game extends JPanel
 		showMove = null;
 		isGameEnd = false;
 		isRoundEnd = false;
+		timer = new Timer(10, this);
+        timer.start();
 	}
 	public void reset()
 	{
@@ -209,7 +213,7 @@ public class Game extends JPanel
 			drawShowCards(move);
 			resetPass();
 		}
-		repaint();
+		// repaint();
 	}
 	private void drawPlayerPass(int playerIndex)
 	{
@@ -303,7 +307,7 @@ public class Game extends JPanel
 			System.out.println("========Round end");
 			// remove the show cards in the middle and repaint the panel
 			removeShowCards();
-			repaint();
+			// repaint();
 			SystemFunc.sleep(2000);
 			if(numRemainPlayer() == 1)
 			{
@@ -421,10 +425,17 @@ public class Game extends JPanel
 	}
 	
 	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+        repaint();  
+    }
+	
+	@Override
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
 		g.drawImage(gui.background, 0, 0, Constant.width, Constant.height, this);
+		// System.out.println("paint");
 	}
 	private class KeyController extends KeyAdapter
 	{

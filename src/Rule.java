@@ -107,6 +107,16 @@ public class Rule implements Constant
         Card[] lastCards = lastMove.getCards();
         Card[] playCards = playMove.getCards();
 
+        if (lastMove == null && playMove == null)
+        {
+            // It's new begining, player must play something.
+            System.out.println("It's a new turn to play a card.");
+            return false;
+        }
+
+        // TODO: whether to handle pass here?
+        // Should (lastMove != null && playMove == null) return true?
+
         int[] lastValue = toggleValue(lastCards);
         int[] playValue = toggleValue(playCards);
 
@@ -114,31 +124,29 @@ public class Rule implements Constant
         int playType = combination(playCards); 
         if (playType == ILLEGAL)
         {
+            // The card combination of player played is illegal.
+            System.out.println("Illegal combination of cards.");
             return false;
         }
-        //System.out.println("type: " + playType + " " + lastType);
 
         int lastBiggest = lastValue[lastValue.length - 1];
         int playBiggest = playValue[playValue.length - 1];
 
-        //System.out.println("value: " + playBiggest + " " + lastBiggest);
         if (lastType == playType)
         {
+            // Same type of combination, compare the biggest cards.
             if (playBiggest > lastBiggest)
             {
                 legal = true;
             }
         }
-
-        else if (playType == FOUR)
-        {
-            legal = true;
-        }
         else
         {
-            legal = false;
+            // Not the same type, return false.
+            System.out.println("Illegal type against current board.");
+            return false;
         }
-        //System.out.println("legal: " + legal);
+        // If it's in revolution, big means small, and small means big.
         return (isRevo) ? (!legal) : legal;
     }
 
@@ -183,7 +191,7 @@ public class Rule implements Constant
         //Brute force search for best replace card.
         for (int bestType = 7; bestType > 1; --bestType)
         {
-            for (int i = 53; i > 0; --i)
+            for (int i = 52; i > 0; --i)
             {
                 newCards[pos] = new Card(i);
                 int type = combination(newCards);
@@ -192,6 +200,8 @@ public class Rule implements Constant
                 }
             }
         }        
+        // Program should not get to this point.
+        System.out.println("Can't find a replace card for joker.");
         return new Card(0);
     }
 

@@ -162,7 +162,7 @@ public class Game extends JPanel implements ActionListener
 			Movement move = new Movement(chosenCard);
 			// players[0].doMove();
 			players[player].doMove(move);
-			SystemFunc.sleep(1000);
+			// SystemFunc.sleep(1000);
 			return true;
 		}
 		else
@@ -454,8 +454,7 @@ public class Game extends JPanel implements ActionListener
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
 				isEnter = true;
-				playerPressedEnter(0);
-				player0Fin = true;
+				player0Fin = playerPressedEnter(0);
 			}
 			if(key == KeyEvent.VK_P && !isPass)
 			{

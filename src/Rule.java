@@ -104,15 +104,27 @@ public class Rule implements Constant
     {
         boolean legal = false;
 
+        if(playMove == null)
+        {
+        	SystemFunc.throwException("current Move is NULL");
+        }
+        
+        if(playMove.numCards == 0)
+        {
+        	// current player pass
+        	// if lastMove == null, which means starting player of the new round, pass is not allow
+        	// if lastMove != null then choose to pass is always OK
+        	return lastMove != null;
+        }
+        if(lastMove == null)
+        {
+        	// starting player of the new round, if the combination is legal than is OK
+        	return combination(playMove.getCards()) != ILLEGAL;
+        }
+        
         Card[] lastCards = lastMove.getCards();
         Card[] playCards = playMove.getCards();
 
-        if (lastMove == null && playMove == null)
-        {
-            // It's new begining, player must play something.
-            System.out.println("It's a new turn to play a card.");
-            return false;
-        }
 
         // TODO: whether to handle pass here?
         // Should (lastMove != null && playMove == null) return true?

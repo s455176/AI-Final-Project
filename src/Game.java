@@ -1,6 +1,6 @@
 import javax.swing.*;
-import java.awt.event.*;
 
+import java.awt.event.*;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -145,21 +145,30 @@ public class Game extends JPanel implements ActionListener
 	public boolean playerPressedEnter(int player)
 	{
 		// actually for player 0
-		if(player == 0 && numChoose > 0)
+		if(player == 0 && numChoose > 0 && numChoose <= Constant.maxMovementCard)
 		{
 			// construct Movement from chosen card
 			Card[] chosenCard = new Card[numChoose];
 			int j = 0;
-			numChoose = 0;
 			for(int i = 0; i < Constant.numMaxHandCard; i++)
 			{
 				if(choose[i])
 				{
-					choose[i] = false;
 					chosenCard[j++] = players[player].hand[i];
 				}
 			}
 			Movement move = new Movement(chosenCard);
+			// cannot do the illegal move
+			if(!Rule.isLegalMove(move, showMove, false))
+			{
+				return false;
+			}
+			// reset the is chosen boolean array if the move is legal and the move will be played
+			numChoose = 0;
+			for(int i = 0; i < Constant.numMaxHandCard; i++)
+			{
+				choose[i] = false;
+			}
 			// players[0].doMove();
 			players[player].doMove(move);
 			// SystemFunc.sleep(1000);
@@ -180,6 +189,11 @@ public class Game extends JPanel implements ActionListener
 		{
 			Card[] pass = new Card[0];
 			Movement passMovement = new Movement(pass);
+			// cannot do the illegal move
+			if(!Rule.isLegalMove(passMovement, showMove, false))
+			{
+				return false;
+			}
 			players[player].doMove(passMovement);
 			return true;
 		}
@@ -195,6 +209,10 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void doMove(Movement move, int playerIndex)
 	{
+		if(!Rule.isLegalMove(move, showMove, false))
+		{
+			SystemFunc.throwException("Illegal Move by player " + playerIndex);
+		}
 		// move with 0 cards means player do the "pass" movement
 		if(move.numCards == 0) 
 		{
@@ -459,8 +477,7 @@ public class Game extends JPanel implements ActionListener
 			if(key == KeyEvent.VK_P && !isPass)
 			{
 				isPass = true;
-				playerPressedPass(0);
-				player0Fin = true;
+				player0Fin = playerPressedPass(0);
 			}
 		}
 		@Override

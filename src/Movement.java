@@ -1,9 +1,10 @@
-import java.io.*;
+import java.util.Arrays;
 
 public class Movement
 {
 	public Card[] cards;
 	public int numCards;
+	public int type;
 	/**
 	 * Constructor of the Movement
 	 * 
@@ -13,6 +14,7 @@ public class Movement
 	{
 		if(cards.length < 0 || cards.length > Constant.maxMovementCard)
 		{
+			type = Constant.ILLEGAL;
 			cards = null;
 			numCards = 0;
 			SystemFunc.throwException("Invalid Movement");
@@ -25,6 +27,8 @@ public class Movement
 			{
 				this.cards[i] = cards[i];
 			}
+			Arrays.sort(this.cards, 0, this.numCards);
+			this.type = Rule.combination(getCards());
 		}
 	}
 	/**

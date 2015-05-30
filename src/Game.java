@@ -69,7 +69,7 @@ public class Game extends JPanel implements ActionListener
 			choose[i] = false;
 		}
 		player0Fin = false;
-		showMove = null;
+		removeShowCards();
 		isGameEnd = false;
 		isRoundEnd = false;
 		deck.shuffle();
@@ -214,7 +214,7 @@ public class Game extends JPanel implements ActionListener
 			SystemFunc.throwException("Illegal Move by player " + playerIndex);
 		}
 		// move with 0 cards means player do the "pass" movement
-		if(move.numCards == 0) 
+		if(move.type == Constant.PASS) 
 		{
 			// draw passed label of the correspondent player
 			drawPlayerPass(playerIndex);
@@ -241,13 +241,17 @@ public class Game extends JPanel implements ActionListener
 	
 	private void removeShowCards()
 	{
-		for(int i = 0; i < showMove.numCards; i++)
+		if(showMove != null)
 		{
-			Card c = showMove.cards[i];
-			remove(gui.cardResource[c.index]);
-			showMove.cards[i] = null;
+			for(int i = 0; i < showMove.numCards; i++)
+			{
+				Card c = showMove.cards[i];
+				remove(gui.cardResource[c.index]);
+				showMove.cards[i] = null;
+			}
+			showMove.numCards = 0;
+			showMove = null;
 		}
-		showMove.numCards = 0;
 	}
 	
 	/**
@@ -323,7 +327,7 @@ public class Game extends JPanel implements ActionListener
 		{
 			turn = runRound(turn);
 			System.out.println("========Round end");
-			// remove the show cards in the middle and repaint the panel
+			// remove the show cards in the middle
 			removeShowCards();
 			// repaint();
 			SystemFunc.sleep(2000);

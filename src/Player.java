@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.*;
 
 public class Player 
 {
@@ -99,4 +100,21 @@ public class Player
 	{
 		return numHandCards == 0;
 	}
+
+	public LinkedList<Movement> genLegalMove(Movement showMove)
+	{
+		LinkedList<Movement> ll = new LinkedList<Movement>();
+		
+		
+		
+		return ll;
+	}
 }
+
+
+
+
+
+
+
+

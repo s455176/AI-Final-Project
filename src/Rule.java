@@ -14,6 +14,9 @@ public class Rule implements Constant
     {
         int length = cards.length;
 
+        if(length == 0)
+        	return PASS;
+        
         // Change rank 1~13 to 3~15 into values array
         int[] values = new int[length];
 
@@ -68,6 +71,7 @@ public class Rule implements Constant
                     (values[0] == values[2] - 2) &&
                     sameSuit )
                     return STRAIGHT3;
+                return ILLEGAL;
 
            case 4:
                 if (sameRank) 
@@ -77,6 +81,7 @@ public class Rule implements Constant
                     (values[0] == values[3] - 3) &&
                     sameSuit )
                     return STRAIGHT4;
+                return ILLEGAL;
 
             case 5:
                 if (sameSuit &&
@@ -85,6 +90,7 @@ public class Rule implements Constant
                     (values[0] == values[3] - 3) &&
                     (values[0] == values[4] - 4) )
                     return STRAIGHT5;
+                return ILLEGAL;
 
             default:
                 return ILLEGAL;
@@ -106,7 +112,7 @@ public class Rule implements Constant
 
         if(playMove == null)
         {
-        	SystemFunc.throwException("current Move is NULL");
+        	SystemFunc.throwException("playing Move is NULL");
         }
         
         if(playMove.numCards == 0)
@@ -119,7 +125,7 @@ public class Rule implements Constant
         if(lastMove == null)
         {
         	// starting player of the new round, if the combination is legal than is OK
-        	return combination(playMove.getCards()) != ILLEGAL;
+        	return playMove.type != ILLEGAL;
         }
         
         Card[] lastCards = lastMove.getCards();
@@ -132,8 +138,8 @@ public class Rule implements Constant
         int[] lastValue = toggleValue(lastCards);
         int[] playValue = toggleValue(playCards);
 
-        int lastType = combination(lastCards);
-        int playType = combination(playCards); 
+        int lastType = lastMove.type;
+        int playType = playMove.type; 
         if (playType == ILLEGAL)
         {
             // The card combination of player played is illegal.
@@ -250,6 +256,7 @@ public class Rule implements Constant
         System.out.println("Test 34567 : " + combination(straight34567));
         System.out.println("Test 12345 : " + combination(straight12345));
         System.out.println("Test JQK12 : " + combination(straightJQK12));
+        System.out.println("Test Pass  : " + combination(new Card[0]));
 
         System.out.println("\nisLegal play test:");
         

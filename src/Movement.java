@@ -5,6 +5,7 @@ public class Movement
 	public Card[] cards;
 	public int numCards;
 	public int type;
+	public int biggestRank;
 	/**
 	 * Constructor of the Movement
 	 * 
@@ -15,6 +16,7 @@ public class Movement
 		if(cards.length < 0 || cards.length > Constant.maxMovementCard)
 		{
 			type = Constant.ILLEGAL;
+			biggestRank = -1;
 			cards = null;
 			numCards = 0;
 			SystemFunc.throwException("Invalid Movement");
@@ -32,7 +34,10 @@ public class Movement
 				}
 			}
 			Arrays.sort(this.cards, 0, this.numCards);
-			this.type = Rule.combination(getCards());
+			Card[] tempCards = getCards();
+			this.type = Rule.combination(tempCards);
+			int[] tempValue = Rule.toggleValue(tempCards);
+			this.biggestRank = tempValue[tempValue.length - 1];
 		}
 	}
 	/**

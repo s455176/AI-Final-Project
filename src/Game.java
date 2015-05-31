@@ -169,6 +169,7 @@ public class Game extends JPanel implements ActionListener
 			{
 				choose[i] = false;
 			}
+			System.out.println(move);
 			// players[0].doMove();
 			players[player].doMove(move);
 			// SystemFunc.sleep(1000);
@@ -475,7 +476,7 @@ public class Game extends JPanel implements ActionListener
 			int key = e.getKeyCode();
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
-				players[0].genLegalMove(null);
+				// players[0].genLegalMove(null);
 				isEnter = true;
 				player0Fin = playerPressedEnter(0);
 			}

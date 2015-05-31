@@ -129,16 +129,9 @@ public class Rule implements Constant
         	// starting player of the new round, if the combination is legal than is OK
         	return playMove.type != ILLEGAL;
         }
-        
-        Card[] lastCards = lastMove.getCards();
-        Card[] playCards = playMove.getCards();
-
 
         // TODO: whether to handle pass here?
         // Should (lastMove != null && playMove == null) return true?
-
-        int[] lastValue = toggleValue(lastCards);
-        int[] playValue = toggleValue(playCards);
 
         int lastType = lastMove.type;
         int playType = playMove.type; 
@@ -149,8 +142,8 @@ public class Rule implements Constant
             return false;
         }
 
-        int lastBiggest = lastValue[lastValue.length - 1];
-        int playBiggest = playValue[playValue.length - 1];
+        int lastBiggest = lastMove.biggestRank;
+        int playBiggest = playMove.biggestRank;
 
         if (lastType == playType)
         {

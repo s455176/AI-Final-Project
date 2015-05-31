@@ -475,6 +475,7 @@ public class Game extends JPanel implements ActionListener
 			int key = e.getKeyCode();
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
+				players[0].genLegalMove(null);
 				isEnter = true;
 				player0Fin = playerPressedEnter(0);
 			}

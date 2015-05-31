@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -50,9 +51,10 @@ public class Rule implements Constant
                 sameRank = false;
             }
         }
-        for (int i = 0; i < cards.length; ++i) {
-            //System.out.println("" + values[i]);
-        }
+//        for (int i = 0; i < cards.length; ++i) {
+//            //System.out.println("" + values[i]);
+//        }
+        Arrays.sort(values);
 
         switch (length){
 
@@ -190,6 +192,7 @@ public class Rule implements Constant
             }
             intArray[i] = (value < 3) ? value + 13 : value;
         }
+        Arrays.sort(intArray);
         return intArray;
     }
 
@@ -205,6 +208,7 @@ public class Rule implements Constant
     {
         Card[] newCards = new Card[cards.length];
         System.arraycopy(cards, 0, newCards, 0, cards.length);
+        Card[] sortedNewCards = new Card[cards.length];
         
         //Brute force search for best replace card.
         for (int bestType = 7; bestType > 1; --bestType)
@@ -212,8 +216,11 @@ public class Rule implements Constant
             for (int i = 52; i > 0; --i)
             {
                 newCards[pos] = new Card(i);
-                int type = combination(newCards);
+                System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
+                Arrays.sort(sortedNewCards);
+                int type = combination(sortedNewCards);
                 if (type == bestType){
+                	System.out.println(type);
                     return new Card(i);
                 }
             }
@@ -248,6 +255,8 @@ public class Rule implements Constant
         Card[] straight34567 = new Card[] {spades[2], joker, spades[4], spades[5], spades[6]};
         Card[] straight12345 = new Card[] {spades[0], spades[1], spades[2], spades[3], spades[4]};
         Card[] straightJQK12 = new Card[] {spades[10], spades[11], spades[12], spades[0], spades[1]};
+        
+        Card[] straightjoker = new Card[] {spades[4], spades[6], joker};
 
         System.out.println("Combination test: ");
         System.out.println("Test double: " + combination(two1));
@@ -257,7 +266,11 @@ public class Rule implements Constant
         System.out.println("Test 12345 : " + combination(straight12345));
         System.out.println("Test JQK12 : " + combination(straightJQK12));
         System.out.println("Test Pass  : " + combination(new Card[0]));
+        System.out.println("Test straightjoker: " + combination(straightjoker));
 
+        Movement m = new Movement(straight34567);
+        System.out.println(m);
+        
         System.out.println("\nisLegal play test:");
         
         Card[] two2    = new Card[] {spades[1], hearts[1]};

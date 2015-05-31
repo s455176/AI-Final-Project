@@ -26,6 +26,10 @@ public class Movement
 			for(int i = 0; i < numCards; i++)
 			{
 				this.cards[i] = cards[i];
+				if(this.cards[i] == null)
+				{
+					SystemFunc.throwException("null card in Movement construct");
+				}
 			}
 			Arrays.sort(this.cards, 0, this.numCards);
 			this.type = Rule.combination(getCards());
@@ -42,4 +46,19 @@ public class Movement
         System.arraycopy(cards, 0, copyArray, 0, cards.length);
         return copyArray;
     }
+	public String toString()
+	{
+		String s = "";
+		for(int i = 0; i < numCards; i++)
+		{
+			s = s + cards[i].toString() + " ";
+		}
+		s = s + type + "\n";
+		return s;
+	}
 }
+
+
+
+
+

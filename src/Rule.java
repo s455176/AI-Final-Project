@@ -211,7 +211,7 @@ public class Rule implements Constant
         Card[] sortedNewCards = new Card[cards.length];
         
         //Brute force search for best replace card.
-        for (int bestType = 7; bestType > 1; --bestType)
+        for (int bestType = 7; bestType >= 1; --bestType)
         {
             for (int i = 52; i > 0; --i)
             {
@@ -257,6 +257,7 @@ public class Rule implements Constant
         Card[] straightJQK12 = new Card[] {spades[10], spades[11], spades[12], spades[0], spades[1]};
         
         Card[] straightjoker = new Card[] {spades[4], spades[6], joker};
+        Card[] singleJoker = new Card[] {joker};
 
         System.out.println("Combination test: ");
         System.out.println("Test double: " + combination(two1));
@@ -267,9 +268,12 @@ public class Rule implements Constant
         System.out.println("Test JQK12 : " + combination(straightJQK12));
         System.out.println("Test Pass  : " + combination(new Card[0]));
         System.out.println("Test straightjoker: " + combination(straightjoker));
+        System.out.println("Test singleJoker: " + combination(singleJoker));
 
-        Movement m = new Movement(straight34567);
-        System.out.println(m);
+        Movement m1 = new Movement(straight34567);
+        Movement m2 = new Movement(singleJoker);
+        System.out.println(m1);
+        System.out.println(m2);
         
         System.out.println("\nisLegal play test:");
         

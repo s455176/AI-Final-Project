@@ -108,13 +108,17 @@ public class Rule implements Constant
      * @return boolean shows the move is legal or not.
      */
     public static boolean isLegalMove(Movement playMove, Movement lastMove, 
-                               boolean isRevo)
+                               boolean isRevo, boolean isStartGame)
     {
         boolean legal = false;
 
         if(playMove == null)
         {
         	SystemFunc.throwException("playing Move is NULL");
+        }
+        if(isStartGame && lastMove != null)
+        {
+        	SystemFunc.throwException("game starts but not new round");
         }
         
         if(playMove.numCards == 0)
@@ -126,8 +130,19 @@ public class Rule implements Constant
         }
         if(lastMove == null)
         {
-        	// starting player of the new round, if the combination is legal than is OK
-        	return playMove.type != ILLEGAL;
+        	if(isStartGame)
+        	{
+        		for(int i = 0; i < playMove.numCards; i++)
+        			if(playMove.cards[i].getIndex() == 42)
+        				return true;
+        		
+        		return false;
+        	}
+        	else
+        	{
+	        	// starting player of the new round, if the combination is legal than is OK
+	        	return playMove.type != ILLEGAL;
+        	}
         }
 
         // TODO: whether to handle pass here?
@@ -286,15 +301,15 @@ public class Rule implements Constant
         Movement s45678Move = new Movement(straight45678);
         Movement s12345Move = new Movement(straight12345);
 
-        System.out.println("Play 1     against 22     : " + isLegalMove(singleMove, two2Move, false));
-        System.out.println("Play 11    against 22     : " + isLegalMove(two1Move, two2Move, false));
-        System.out.println("Play 22    against 11     : " + isLegalMove(two2Move, two1Move, false));
-        System.out.println("Play 333   against 22     : " + isLegalMove(triple3Move, two2Move, false));
-        System.out.println("Play 333   against 222    : " + isLegalMove(triple3Move, triple2Move, false));
-        System.out.println("Play 3333  against 1      : " + isLegalMove(four3Move, singleMove, false));
-        System.out.println("Play 4444  against 333    : " + isLegalMove(four4Move, triple3Move, false));
-        System.out.println("Play 34567 against 45678  : " + isLegalMove(s34567Move, s45678Move, false));
-        System.out.println("Play 12345 against 45678  : " + isLegalMove(s12345Move, s45678Move, false));
+        System.out.println("Play 1     against 22     : " + isLegalMove(singleMove, two2Move, false, false));
+        System.out.println("Play 11    against 22     : " + isLegalMove(two1Move, two2Move, false, false));
+        System.out.println("Play 22    against 11     : " + isLegalMove(two2Move, two1Move, false, false));
+        System.out.println("Play 333   against 22     : " + isLegalMove(triple3Move, two2Move, false, false));
+        System.out.println("Play 333   against 222    : " + isLegalMove(triple3Move, triple2Move, false, false));
+        System.out.println("Play 3333  against 1      : " + isLegalMove(four3Move, singleMove, false, false));
+        System.out.println("Play 4444  against 333    : " + isLegalMove(four4Move, triple3Move, false, false));
+        System.out.println("Play 34567 against 45678  : " + isLegalMove(s34567Move, s45678Move, false, false));
+        System.out.println("Play 12345 against 45678  : " + isLegalMove(s12345Move, s45678Move, false, false));
         System.out.println("");
     }
 }

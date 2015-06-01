@@ -16,7 +16,7 @@ public class Game extends JPanel implements ActionListener
 	private GUIResource gui;
 	private KeyController keyController;
 	private Movement showMove;
-	private boolean isGameEnd, isRoundEnd;
+	private boolean isGameEnd, isRoundEnd, isStartGame;
 	public boolean[] isPlayerPassed;
 	
 	// for player 0
@@ -53,6 +53,7 @@ public class Game extends JPanel implements ActionListener
 		showMove = null;
 		isGameEnd = false;
 		isRoundEnd = false;
+		isStartGame = true;
 		timer = new Timer(10, this);
         timer.start();
 	}
@@ -71,19 +72,29 @@ public class Game extends JPanel implements ActionListener
 		player0Fin = false;
 		removeShowCards();
 		isGameEnd = false;
+		isStartGame = true;
 		isRoundEnd = false;
 		deck.shuffle();
+	}
+	
+	
+	public boolean getIsStartGame()
+	{
+		return isStartGame;
 	}
 	
 	/**
 	 * deal the cards to 4 players, and also need to draw the cards on the JPanel
 	 */
-	public void deal()
+	public int deal()
 	{
 		int turn = 0;
+		int startingPlayer = -1;
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{
 			Card c = deck.getNext();
+			if(c.getIndex() == 42)
+				startingPlayer = turn;
 			players[turn].getCard(c);
 			turn = (turn + 1) % 4;
 		}
@@ -112,6 +123,11 @@ public class Game extends JPanel implements ActionListener
 		{
 			remove(gui.passLabel[i]);
 		}
+		
+		if(startingPlayer == -1)
+			SystemFunc.throwException("cannot find CLUB 3 when dealing cards");
+		
+		return startingPlayer;
 	}
 	/**
 	 * label the clicked card as chosen by the player and move up in the hand 
@@ -159,7 +175,7 @@ public class Game extends JPanel implements ActionListener
 			}
 			Movement move = new Movement(chosenCard);
 			// cannot do the illegal move
-			if(!Rule.isLegalMove(move, showMove, false))
+			if(!Rule.isLegalMove(move, showMove, false, isStartGame))
 			{
 				return false;
 			}
@@ -191,7 +207,7 @@ public class Game extends JPanel implements ActionListener
 			Card[] pass = new Card[0];
 			Movement passMovement = new Movement(pass);
 			// cannot do the illegal move
-			if(!Rule.isLegalMove(passMovement, showMove, false))
+			if(!Rule.isLegalMove(passMovement, showMove, false, isStartGame))
 			{
 				return false;
 			}
@@ -210,7 +226,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void doMove(Movement move, int playerIndex)
 	{
-		if(!Rule.isLegalMove(move, showMove, false))
+		if(!Rule.isLegalMove(move, showMove, false, isStartGame))
 		{
 			SystemFunc.throwException("Illegal Move by player " + playerIndex);
 		}
@@ -322,8 +338,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void run()
 	{
-		int turn = 0;
-		deal();
+		int turn = deal();
 		while(!isGameEnd)
 		{
 			turn = runRound(turn);
@@ -420,7 +435,7 @@ public class Game extends JPanel implements ActionListener
 				break;
 			}
 			// player decide a movement
-			System.out.println("turn " + turn);
+			System.out.println("turn " + turn + ", isGameStart: " + isStartGame);
 			if(turn == 0)
 			{
 				addKeyListener(keyController);
@@ -436,6 +451,7 @@ public class Game extends JPanel implements ActionListener
 				players[turn].takeTurn();
 			}
 			// after player do a moment
+			isStartGame = false;
 			if(!isPlayerPassed[turn] && players[turn].isFinish())
 			{
 				// a player has no hand cards after do a non-pass movement (ie, this player finishes)

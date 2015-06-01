@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.*;
 
 public class Player 
@@ -101,6 +100,11 @@ public class Player
 		return numHandCards == 0;
 	}
 
+	public Movement getGameShowMove()
+	{
+		return game.getShowMove();
+	}
+	
 	public LinkedList<Movement> genLegalMove(Movement showMove)
 	{
 		boolean genAll = (showMove == null);
@@ -134,25 +138,25 @@ public class Player
 			{
 				case Constant.SINGLE:
 					if(hasJoker)
-						findAllSingle(ll, shrinkHand, true, hand[jokerPos]);
+						findAllSingle(ll, shrinkHand, true, hand[jokerPos], showMove);
 					else
-						findAllSingle(ll, shrinkHand, false, null);
+						findAllSingle(ll, shrinkHand, false, null, showMove);
 					break;
 					
 				case Constant.PAIR:
 				case Constant.TRIPLE:
 				case Constant.FOUR:
 					if(hasJoker)
-						findContinuousWithJoker(ll, shrinkHand, type, hand[jokerPos]);
-					findContinuousWithoutJoker(ll, shrinkHand, type);
+						findContinuousWithJoker(ll, shrinkHand, type, hand[jokerPos], showMove);
+					findContinuousWithoutJoker(ll, shrinkHand, type, showMove);
 					break;
 					
 				case Constant.STRAIGHT3:
 				case Constant.STRAIGHT4:
 				case Constant.STRAIGHT5:
 					if(hasJoker)
-						findStraightWithJoker(ll, shrinkHand, type - Constant.PAIR, hand[jokerPos]);
-					findStraightWithoutJoker(ll, shrinkHand, type - Constant.PAIR);
+						findStraightWithJoker(ll, shrinkHand, type - Constant.PAIR, hand[jokerPos], showMove);
+					findStraightWithoutJoker(ll, shrinkHand, type - Constant.PAIR, showMove);
 					break;
 				
 				default:
@@ -163,7 +167,6 @@ public class Player
 			ll.add(new Movement(c));
 		}
 			
-		
 		System.out.println(ll);
 		
 		return ll;
@@ -173,23 +176,23 @@ public class Player
 	{
 		if(hasJoker)
 			for(int i = 3; i <=5 ; i++)
-				findStraightWithJoker(ll, shrinkHand, i, hand[jokerPos]);
+				findStraightWithJoker(ll, shrinkHand, i, hand[jokerPos], null);
 		for(int i = 3; i <=5 ; i++)
-			findStraightWithoutJoker(ll, shrinkHand, i);
+			findStraightWithoutJoker(ll, shrinkHand, i, null);
 
 		if(hasJoker)
 			for(int i = 2; i <= 4; i++)
-				findContinuousWithJoker(ll, shrinkHand, i, hand[jokerPos]);
+				findContinuousWithJoker(ll, shrinkHand, i, hand[jokerPos], null);
 		for(int i = 2; i <= 4; i++)
-			findContinuousWithoutJoker(ll, shrinkHand, i);
+			findContinuousWithoutJoker(ll, shrinkHand, i, null);
 		
 		if(hasJoker)
-			findAllSingle(ll, shrinkHand, true, hand[jokerPos]);
+			findAllSingle(ll, shrinkHand, true, hand[jokerPos], null);
 		else
-			findAllSingle(ll, shrinkHand, false, null);
+			findAllSingle(ll, shrinkHand, false, null, null);
 	}
 	
-	private void findStraightWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length)
+	private void findStraightWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Movement showMove)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
@@ -227,11 +230,15 @@ public class Player
 					}
 				}
 				if(k - j == length)
-					ll.add(new Movement(c));
+				{
+					Movement m = new Movement(c);
+					if(Rule.isLegalMove(m, showMove, false))
+						ll.add(m);
+				}
 			}
 		}
 	}
-	private void findContinuousWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length)
+	private void findContinuousWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Movement showMove)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
@@ -261,7 +268,9 @@ public class Player
 								Card[] c = new Card[2];
 								c[0] = shrinkHand[allCards[i * 4 + j]];
 								c[1] = shrinkHand[allCards[i * 4 + k]];
-								ll.add(new Movement(c));
+								Movement m = new Movement(c);
+								if(Rule.isLegalMove(m, showMove, false))
+									ll.add(m);
 							}
 								
 				}
@@ -283,7 +292,11 @@ public class Player
 							}
 						}
 						if(count == 3)
-							ll.add(new Movement(c));
+						{
+							Movement m = new Movement(c);
+							if(Rule.isLegalMove(m, showMove, false))
+								ll.add(m);
+						}
 					}
 				}
 				else if(length == 4)
@@ -293,28 +306,34 @@ public class Player
 					{
 						c[j] = shrinkHand[allCards[i * 4 + j]];
 					}
-					ll.add(new Movement(c));
+					Movement m = new Movement(c);
+					if(Rule.isLegalMove(m, showMove, false))
+						ll.add(m);
 				}
 			}
 		}
 	}
-	private void findAllSingle(LinkedList<Movement> ll, Card[] shrinkHand, boolean hasJoker, Card joker)
+	private void findAllSingle(LinkedList<Movement> ll, Card[] shrinkHand, boolean hasJoker, Card joker, Movement showMove)
 	{
 		for(int i = 0; i < shrinkHand.length; i++)
 		{
 			Card[] c = new Card[1];
 			c[0] = shrinkHand[i];
-			ll.add(new Movement(c));
+			Movement m = new Movement(c);
+			if(Rule.isLegalMove(m, showMove, false))
+				ll.add(m);
 		}
 		if(hasJoker)
 		{
 			Card[] c = new Card[1];
 			c[0] = joker;
-			ll.add(new Movement(c));
+			Movement m = new Movement(c);
+			if(Rule.isLegalMove(m, showMove, false))
+				ll.add(m);
 		}
 	}
 	
-	private void findStraightWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker)
+	private void findStraightWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker, Movement showMove)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
@@ -335,7 +354,7 @@ public class Player
 		{
 			for(int i = 0; i < 4; i++)
 			{			
-				for(int j = 0; j < 13; j++)
+				for(int j = 0; j < 13 - length + 1; j++)
 				{
 					// System.out.println(i + " " + j);
 					Card[] c = new Card[length];
@@ -355,7 +374,8 @@ public class Player
 					if(k - j == length)
 					{
 						Movement m = new Movement(c);
-						ll.add(m);
+						if(Rule.isLegalMove(m, showMove, false))
+							ll.add(m);
 						// System.out.println(m);
 					}
 				}
@@ -390,14 +410,15 @@ public class Player
 				{
 					c[newLength] = joker;
 					Movement m = new Movement(c);
-					ll.add(m);
+					if(Rule.isLegalMove(m, showMove, false))
+						ll.add(m);
 					// System.out.println(m);
 				}
 			}
 		}
 	}
 	
-	private void findContinuousWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker)
+	private void findContinuousWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker, Movement showMove)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
@@ -427,7 +448,9 @@ public class Player
 							Card[] c = new Card[2];
 							c[0] = shrinkHand[allCards[i * 4 + j]];
 							c[1] = joker;
-							ll.add(new Movement(c));
+							Movement m = new Movement(c);
+							if(Rule.isLegalMove(m, showMove, false))
+								ll.add(m);
 						}
 					}
 				}
@@ -441,7 +464,9 @@ public class Player
 								c[0] = shrinkHand[allCards[i * 4 + j]];
 								c[1] = shrinkHand[allCards[i * 4 + k]];
 								c[2] = joker;
-								ll.add(new Movement(c));
+								Movement m = new Movement(c);
+								if(Rule.isLegalMove(m, showMove, false))
+									ll.add(m);
 							}
 				}
 				else if(length == 4)
@@ -464,7 +489,9 @@ public class Player
 						if(count == 3)
 						{
 							c[count] = joker;
-							ll.add(new Movement(c));
+							Movement m = new Movement(c);
+							if(Rule.isLegalMove(m, showMove, false))
+								ll.add(m);
 						}
 					}
 				}
@@ -477,21 +504,49 @@ public class Player
 	{
 		Game g = new Game();
 		Player p = new Player(g, 0);
-		p.getCard(new Card(3));
-		p.getCard(new Card(4));
-		p.getCard(new Card(0));
-		p.getCard(new Card(6));
-		p.getCard(new Card(7));
-		p.getCard(new Card(9));
-		p.getCard(new Card(10));
-		p.getCard(new Card(8));
-		p.getCard(new Card(21));
-		p.getCard(new Card(34));
-		p.getCard(new Card(47));
+		Card[] spades = new Card[13];
+        Card[] hearts = new Card[13];
+        Card[] diams  = new Card[13];
+        Card[] clubs  = new Card[13];
+        Card joker = new Card(0);
+        for (int i = 0; i<13; ++i)
+        {
+            spades[i] = new Card(i + 1);
+            hearts[i] = new Card(i + 14);
+            diams[i]  = new Card(i + 27);
+            clubs[i]  = new Card(i + 40);
+        }
+		p.getCard(spades[2]);
+		p.getCard(spades[3]);
+		p.getCard(diams[4]);
+		p.getCard(diams[6]);
+		p.getCard(spades[7]);
+		p.getCard(hearts[7]);
+		p.getCard(hearts[8]);
+		p.getCard(spades[9]);
+		p.getCard(diams[10]);
+		p.getCard(spades[10]);
+		p.getCard(diams[11]);
+		p.getCard(clubs[0]);
+		p.getCard(spades[1]);
+		p.getCard(joker);
+		
+		Card[] showCard = new Card[4];
+		showCard[0] = spades[7];
+		showCard[1] = spades[8];
+		showCard[2] = spades[5];
+		showCard[3] = joker;
+		
+		System.out.println("=== genALL ===");
 		p.genLegalMove(null);
+		Movement showMove = new Movement(showCard);
+		System.out.println("=== against " + showMove + " type: " + showMove.type + ", rank: " + showMove.biggestRank);
+		p.genLegalMove(new Movement(showCard));
+		
 		System.out.println("End");
 	}
 }
+
 
 
 

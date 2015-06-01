@@ -56,6 +56,9 @@ public class Movement
     }
 	public String toString()
 	{
+		if(type == Constant.PASS)
+			return "Pass";
+		
 		String s = "";
 		for(int i = 0; i < numCards; i++)
 		{

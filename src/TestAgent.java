@@ -1,5 +1,5 @@
 import java.util.Random;
-
+import java.util.*;
 
 public class TestAgent extends Agent
 {
@@ -20,18 +20,23 @@ public class TestAgent extends Agent
 	 */
 	public Movement decideMove()
 	{
-		int num = player.numHandCards;
+		// int num = player.numHandCards;
 		// int count = (num > Constant.maxMovementCard)? rn.nextInt(Constant.maxMovementCard + 1):num;
-		int count = 0;
-		Card[] c = new Card[count];
-		int nextStart = start + count;
-		int j = 0;
-		for(int i = start; i < start + count; i++)
-		{
-			c[j] = player.hand[i];
-			j++;
-		}
-		start = nextStart;
-		return new Movement(c);
+//		int count = 0;
+//		Card[] c = new Card[count];
+//		int nextStart = start + count;
+//		int j = 0;
+//		for(int i = start; i < start + count; i++)
+//		{
+//			c[j] = player.hand[i];
+//			j++;
+//		}
+//		start = nextStart;
+//		return new Movement(c);
+		LinkedList<Movement> ll = player.genLegalMove(player.getGameShowMove());
+		int numElement = ll.size();
+		int index = rn.nextInt(numElement);
+		System.out.println(numElement + " " + index);
+		return ll.get(index);
 	}
 }

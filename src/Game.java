@@ -375,6 +375,11 @@ public class Game extends JPanel implements ActionListener
 	}
 	
 	
+	public Movement getShowMove()
+	{
+		return showMove;
+	}
+	
 	private int findNextPlayerWithHandCards(int cur)
 	{
 		int nextStartTurn = -1;
@@ -476,7 +481,7 @@ public class Game extends JPanel implements ActionListener
 			int key = e.getKeyCode();
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
-				players[0].genLegalMove(null);
+				players[0].genLegalMove(showMove);
 				isEnter = true;
 				player0Fin = playerPressedEnter(0);
 			}

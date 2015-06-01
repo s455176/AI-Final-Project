@@ -213,7 +213,7 @@ public class Rule implements Constant
                 Arrays.sort(sortedNewCards);
                 int type = combination(sortedNewCards);
                 if (type == bestType){
-                	System.out.println(type);
+                	// System.out.println(type);
                     return new Card(i);
                 }
             }

@@ -36,8 +36,11 @@ public class Movement
 			Arrays.sort(this.cards, 0, this.numCards);
 			Card[] tempCards = getCards();
 			this.type = Rule.combination(tempCards);
-			int[] tempValue = Rule.toggleValue(tempCards);
-			this.biggestRank = tempValue[tempValue.length - 1];
+			if(type != Constant.PASS)
+			{
+				int[] tempValue = Rule.toggleValue(tempCards);
+				this.biggestRank = tempValue[tempValue.length - 1];
+			}
 		}
 	}
 	/**
@@ -60,6 +63,21 @@ public class Movement
 		}
 		s = s + type + "\n";
 		return s;
+	}
+	public boolean isEqual(Movement m)
+	{
+		if(this.numCards != m.numCards)
+			return false;
+		Card[] c1 = this.getCards();
+		Card[] c2 = m.getCards();
+		Arrays.sort(c1);
+		Arrays.sort(c2);
+		for(int i = 0; i < c1.length; i++)
+		{
+			if(c1[i].index != c2[i].index)
+				return false;
+		}
+		return true;
 	}
 }
 

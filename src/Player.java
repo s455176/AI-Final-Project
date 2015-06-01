@@ -108,9 +108,11 @@ public class Player
 		
 		// not a good method to check whether there is a joker in hand, and then I can initialize the shrinkHand array
 		boolean hasJoker = false;
+		int jokerPos = -1;
 		for(int i = 0; i < Constant.numMaxHandCard; i++)
 			if(hand[i] != null && hand[i].isJoker())
 			{
+				jokerPos = i;
 				hasJoker = true;
 				break;
 			}
@@ -124,34 +126,88 @@ public class Player
 		}
 		
 		if(genAll)
+			genAll(ll, shrinkHand, hasJoker, jokerPos);
+		else
 		{
-			findAllSingle(ll, shrinkHand);
-			for(int i = 2; i <= 4; i++)
+			int type = showMove.type;
+			switch(type)
 			{
-				findContinuous(ll, shrinkHand, i);
-				findStraight(ll, shrinkHand, i + 1);
+				case Constant.SINGLE:
+					if(hasJoker)
+						findAllSingle(ll, shrinkHand, true, hand[jokerPos]);
+					else
+						findAllSingle(ll, shrinkHand, false, null);
+					break;
+					
+				case Constant.PAIR:
+				case Constant.TRIPLE:
+				case Constant.FOUR:
+					if(hasJoker)
+						findContinuousWithJoker(ll, shrinkHand, type, hand[jokerPos]);
+					findContinuousWithoutJoker(ll, shrinkHand, type);
+					break;
+					
+				case Constant.STRAIGHT3:
+				case Constant.STRAIGHT4:
+				case Constant.STRAIGHT5:
+					if(hasJoker)
+						findStraightWithJoker(ll, shrinkHand, type - Constant.PAIR, hand[jokerPos]);
+					findStraightWithoutJoker(ll, shrinkHand, type - Constant.PAIR);
+					break;
+				
+				default:
+					SystemFunc.throwException("Error occurs in player genLegalMove cause showMove has wrong type");
 			}
+			// genPass
+			Card[] c = new Card[0];
+			ll.add(new Movement(c));
 		}
+			
 		
 		System.out.println(ll);
 		
 		return ll;
 	}
+
+	private void genAll(LinkedList<Movement> ll, Card[] shrinkHand, boolean hasJoker, int jokerPos)
+	{
+		if(hasJoker)
+			for(int i = 3; i <=5 ; i++)
+				findStraightWithJoker(ll, shrinkHand, i, hand[jokerPos]);
+		for(int i = 3; i <=5 ; i++)
+			findStraightWithoutJoker(ll, shrinkHand, i);
+
+		if(hasJoker)
+			for(int i = 2; i <= 4; i++)
+				findContinuousWithJoker(ll, shrinkHand, i, hand[jokerPos]);
+		for(int i = 2; i <= 4; i++)
+			findContinuousWithoutJoker(ll, shrinkHand, i);
+		
+		if(hasJoker)
+			findAllSingle(ll, shrinkHand, true, hand[jokerPos]);
+		else
+			findAllSingle(ll, shrinkHand, false, null);
+	}
 	
-	private void findStraight(LinkedList<Movement> ll, Card[] shrinkHand, int length)
+	private void findStraightWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
+		int[] suitCount = new int[4];
 		
 		Arrays.fill(allCards, -1);
+		Arrays.fill(suitCount, 0);
 		for(int i = 0; i < shrinkHand.length; i++)
 		{
 			int value = shrinkHand[i].getValue() - 3;
 			int suit = shrinkHand[i].getSuit();
 			allCards[suit * 13 + value] = i;
+			suitCount[suit]++;
 		}
 		for(int i = 0; i < 4; i++)
 		{
+			if(suitCount[i] < length)
+				continue;
 			for(int j = 0; j < 13 - length + 1; j++)
 			{
 				// System.out.println(i + " " + j);
@@ -175,7 +231,7 @@ public class Player
 			}
 		}
 	}
-	private void findContinuous(LinkedList<Movement> ll, Card[] shrinkHand, int length)
+	private void findContinuousWithoutJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length)
 	{
 		// not consider joker 
 		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
@@ -242,7 +298,7 @@ public class Player
 			}
 		}
 	}
-	private void findAllSingle(LinkedList<Movement> ll, Card[] shrinkHand)
+	private void findAllSingle(LinkedList<Movement> ll, Card[] shrinkHand, boolean hasJoker, Card joker)
 	{
 		for(int i = 0; i < shrinkHand.length; i++)
 		{
@@ -250,21 +306,190 @@ public class Player
 			c[0] = shrinkHand[i];
 			ll.add(new Movement(c));
 		}
+		if(hasJoker)
+		{
+			Card[] c = new Card[1];
+			c[0] = joker;
+			ll.add(new Movement(c));
+		}
 	}
 	
+	private void findStraightWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker)
+	{
+		// not consider joker 
+		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
+		int[] suitCount = new int[4];
+		
+		Arrays.fill(allCards, -1);
+		Arrays.fill(suitCount, 0);
+		for(int i = 0; i < shrinkHand.length; i++)
+		{
+			int value = shrinkHand[i].getValue() - 3;
+			int suit = shrinkHand[i].getSuit();
+			allCards[suit * 13 + value] = i;
+			suitCount[suit]++;
+		}
+		// enumerate all joker put in middle case 
+		// System.out.println("Joker in middle");
+		for(int l = 1; l < length - 1; l++)
+		{
+			for(int i = 0; i < 4; i++)
+			{			
+				for(int j = 0; j < 13; j++)
+				{
+					// System.out.println(i + " " + j);
+					Card[] c = new Card[length];
+					int k;
+					for(k = j; k < j + length; k++)
+					{
+						if(k == j + l)
+						{
+							c[k - j] = joker;
+							continue;
+						}
+						if(allCards[i * 13 + k] == -1)
+							break;
+						else
+							c[k - j] = shrinkHand[allCards[i * 13 + k]];
+					}
+					if(k - j == length)
+					{
+						Movement m = new Movement(c);
+						ll.add(m);
+						// System.out.println(m);
+					}
+				}
+			}
+		}
+		// enumerate joker put in side, so from straight length - 1 to length
+		// System.out.println("Joker in side");
+		int newLength = length - 1;
+		for(int i = 0; i < 4; i++)
+		{
+			if(suitCount[i] < newLength)
+				continue;
+			for(int j = 0; j < 13 - newLength + 1; j++)
+			{
+				// System.out.println(i + " " + j);
+				Card[] c = new Card[newLength + 1];
+				int k;
+				for(k = j; k < j + newLength; k++)
+				{
+					if(allCards[i * 13 + k] == -1)
+					{
+						// System.out.println("*" + k);
+						j = k;
+						break;
+					}
+					else
+					{
+						c[k - j] = shrinkHand[allCards[i * 13 + k]];
+					}
+				}
+				if(k - j == newLength)
+				{
+					c[newLength] = joker;
+					Movement m = new Movement(c);
+					ll.add(m);
+					// System.out.println(m);
+				}
+			}
+		}
+	}
 	
+	private void findContinuousWithJoker(LinkedList<Movement> ll, Card[] shrinkHand, int length, Card joker)
+	{
+		// not consider joker 
+		int[] allCards = new int[52]; // value from 3 to 15, suit from 0 to 3
+		int[] valueCount = new int[13];
+		
+		Arrays.fill(allCards, -1);
+		Arrays.fill(valueCount, 0);
+		for(int i = 0; i < shrinkHand.length; i++)
+		{
+			int value = shrinkHand[i].getValue() - 3;
+			int suit = shrinkHand[i].getSuit();
+			allCards[value * 4 + suit] = i;
+			valueCount[value]++;
+		}
+		for(int i = 0; i < 13; i++)
+		{
+			if(valueCount[i] < length - 1)
+				continue;
+			else
+			{
+				if(length == 2)
+				{
+					for(int j = 0; j < 4; j++)
+					{
+						if(allCards[i * 4 + j] != -1)
+						{
+							Card[] c = new Card[2];
+							c[0] = shrinkHand[allCards[i * 4 + j]];
+							c[1] = joker;
+							ll.add(new Movement(c));
+						}
+					}
+				}
+				else if(length == 3)
+				{
+					for(int j = 0; j < 4; j++)
+						for(int k = j + 1; k < 4; k++)
+							if(allCards[i * 4 + j] != -1 && allCards[i * 4 + k] != -1)
+							{
+								Card[] c = new Card[3];
+								c[0] = shrinkHand[allCards[i * 4 + j]];
+								c[1] = shrinkHand[allCards[i * 4 + k]];
+								c[2] = joker;
+								ll.add(new Movement(c));
+							}
+				}
+				else if(length == 4)
+				{
+					for(int j = 0; j < 4; j++)
+					{
+						int count = 0;
+						Card[] c = new Card[4];
+						for(int k = 0; k < 4; k++)
+						{
+							if(k == j) continue;
+							if(allCards[i * 4 + k] == -1)
+								break;
+							else
+							{
+								c[count] = shrinkHand[allCards[i * 4 + k]];
+								count++;
+							}
+						}
+						if(count == 3)
+						{
+							c[count] = joker;
+							ll.add(new Movement(c));
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	// unit test
 	public static void main(String[] args)
 	{
 		Game g = new Game();
 		Player p = new Player(g, 0);
-		p.getCard(new Card(1));
-		p.getCard(new Card(14));
-		p.getCard(new Card(27));
-		p.getCard(new Card(40));
 		p.getCard(new Card(3));
+		p.getCard(new Card(4));
+		p.getCard(new Card(0));
+		p.getCard(new Card(6));
+		p.getCard(new Card(7));
+		p.getCard(new Card(9));
+		p.getCard(new Card(10));
+		p.getCard(new Card(8));
+		p.getCard(new Card(21));
+		p.getCard(new Card(34));
+		p.getCard(new Card(47));
 		p.genLegalMove(null);
+		System.out.println("End");
 	}
 }
 

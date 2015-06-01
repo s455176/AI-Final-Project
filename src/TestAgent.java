@@ -21,8 +21,8 @@ public class TestAgent extends Agent
 	public Movement decideMove()
 	{
 		int num = player.numHandCards;
-		int count = (num > Constant.maxMovementCard)? rn.nextInt(Constant.maxMovementCard + 1):num;
-		// int count = 0;
+		// int count = (num > Constant.maxMovementCard)? rn.nextInt(Constant.maxMovementCard + 1):num;
+		int count = 0;
 		Card[] c = new Card[count];
 		int nextStart = start + count;
 		int j = 0;

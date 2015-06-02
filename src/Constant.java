@@ -38,6 +38,7 @@ public interface Constant
 	    static final int passLabelHeight = 80;
 	    
 	    // Different combinations of cards
+		static final int NEWROUND  = -1;
         static final int ILLEGAL   = 0;
         static final int SINGLE    = 1;
         static final int PAIR      = 2;
@@ -46,8 +47,5 @@ public interface Constant
         static final int STRAIGHT3 = 5;
         static final int STRAIGHT4 = 6;
         static final int STRAIGHT5 = 7;
-		
-		// B01902018
-		static final int NEWROUND  = -1;
 		static final int PASS      = 8;
 }

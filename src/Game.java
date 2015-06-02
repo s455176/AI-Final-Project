@@ -1,6 +1,6 @@
 import javax.swing.*;
-import java.awt.event.*;
 
+import java.awt.event.*;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -16,7 +16,7 @@ public class Game extends JPanel implements ActionListener
 	private GUIResource gui;
 	private KeyController keyController;
 	private Movement showMove;
-	private boolean isGameEnd, isRoundEnd;
+	private boolean isGameEnd, isRoundEnd, isStartGame;
 	public boolean[] isPlayerPassed;
 	
 	// for player 0
@@ -56,6 +56,7 @@ public class Game extends JPanel implements ActionListener
 		showMove = null;
 		isGameEnd = false;
 		isRoundEnd = false;
+		isStartGame = true;
 		timer = new Timer(10, this);
         timer.start();
 		
@@ -75,21 +76,31 @@ public class Game extends JPanel implements ActionListener
 			choose[i] = false;
 		}
 		player0Fin = false;
-		showMove = null;
+		removeShowCards();
 		isGameEnd = false;
+		isStartGame = true;
 		isRoundEnd = false;
 		deck.shuffle();
+	}
+	
+	
+	public boolean getIsStartGame()
+	{
+		return isStartGame;
 	}
 	
 	/**
 	 * deal the cards to 4 players, and also need to draw the cards on the JPanel
 	 */
-	public void deal()
+	public int deal()
 	{
 		int turn = 0;
+		int startingPlayer = -1;
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{
 			Card c = deck.getNext();
+			if(c.getIndex() == 42)
+				startingPlayer = turn;
 			players[turn].getCard(c);
 			turn = (turn + 1) % 4;
 		}
@@ -118,6 +129,11 @@ public class Game extends JPanel implements ActionListener
 		{
 			remove(gui.passLabel[i]);
 		}
+		
+		if(startingPlayer == -1)
+			SystemFunc.throwException("cannot find CLUB 3 when dealing cards");
+		
+		return startingPlayer;
 	}
 	/**
 	 * label the clicked card as chosen by the player and move up in the hand 
@@ -151,24 +167,34 @@ public class Game extends JPanel implements ActionListener
 	public boolean playerPressedEnter(int player)
 	{
 		// actually for player 0
-		if(player == 0 && numChoose > 0)
+		if(player == 0 && numChoose > 0 && numChoose <= Constant.maxMovementCard)
 		{
 			// construct Movement from chosen card
 			Card[] chosenCard = new Card[numChoose];
 			int j = 0;
-			numChoose = 0;
 			for(int i = 0; i < Constant.numMaxHandCard; i++)
 			{
 				if(choose[i])
 				{
-					choose[i] = false;
 					chosenCard[j++] = players[player].hand[i];
 				}
 			}
 			Movement move = new Movement(chosenCard);
+			// cannot do the illegal move
+			if(!Rule.isLegalMove(move, showMove, false, isStartGame))
+			{
+				return false;
+			}
+			// reset the is chosen boolean array if the move is legal and the move will be played
+			numChoose = 0;
+			for(int i = 0; i < Constant.numMaxHandCard; i++)
+			{
+				choose[i] = false;
+			}
+			System.out.println(move);
 			// players[0].doMove();
 			players[player].doMove(move);
-			SystemFunc.sleep(1000);
+			// SystemFunc.sleep(1000);
 			return true;
 		}
 		else
@@ -186,6 +212,11 @@ public class Game extends JPanel implements ActionListener
 		{
 			Card[] pass = new Card[0];
 			Movement passMovement = new Movement(pass);
+			// cannot do the illegal move
+			if(!Rule.isLegalMove(passMovement, showMove, false, isStartGame))
+			{
+				return false;
+			}
 			players[player].doMove(passMovement);
 			return true;
 		}
@@ -201,8 +232,12 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void doMove(Movement move, int playerIndex)
 	{
+		if(!Rule.isLegalMove(move, showMove, false, isStartGame))
+		{
+			SystemFunc.throwException("Illegal Move by player " + playerIndex);
+		}
 		// move with 0 cards means player do the "pass" movement
-		if(move.numCards == 0) 
+		if(move.type == Constant.PASS) 
 		{
 			// draw passed label of the correspondent player
 			drawPlayerPass(playerIndex);
@@ -229,13 +264,17 @@ public class Game extends JPanel implements ActionListener
 	
 	private void removeShowCards()
 	{
-		for(int i = 0; i < showMove.numCards; i++)
+		if(showMove != null)
 		{
-			Card c = showMove.cards[i];
-			remove(gui.cardResource[c.index]);
-			showMove.cards[i] = null;
+			for(int i = 0; i < showMove.numCards; i++)
+			{
+				Card c = showMove.cards[i];
+				remove(gui.cardResource[c.index]);
+				showMove.cards[i] = null;
+			}
+			showMove.numCards = 0;
+			showMove = null;
 		}
-		showMove.numCards = 0;
 	}
 	
 	/**
@@ -305,13 +344,12 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void run()
 	{
-		int turn = 0;
-		deal();
+		int turn = deal();
 		while(!isGameEnd)
 		{
 			turn = runRound(turn);
 			System.out.println("========Round end");
-			// remove the show cards in the middle and repaint the panel
+			// remove the show cards in the middle
 			removeShowCards();
 			// repaint();
 			SystemFunc.sleep(2000);
@@ -358,6 +396,11 @@ public class Game extends JPanel implements ActionListener
 	}
 	
 	
+	public Movement getShowMove()
+	{
+		return showMove;
+	}
+	
 	private int findNextPlayerWithHandCards(int cur)
 	{
 		int nextStartTurn = -1;
@@ -398,7 +441,7 @@ public class Game extends JPanel implements ActionListener
 				break;
 			}
 			// player decide a movement
-			System.out.println("turn " + turn);
+			System.out.println("turn " + turn + ", isGameStart: " + isStartGame);
 			if(turn == 0)
 			{
 				addKeyListener(keyController);
@@ -414,6 +457,7 @@ public class Game extends JPanel implements ActionListener
 				players[turn].takeTurn();
 			}
 			// after player do a moment
+			isStartGame = false;
 			if(!isPlayerPassed[turn] && players[turn].isFinish())
 			{
 				// a player has no hand cards after do a non-pass movement (ie, this player finishes)
@@ -459,15 +503,14 @@ public class Game extends JPanel implements ActionListener
 			int key = e.getKeyCode();
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
+				players[0].genLegalMove(showMove);
 				isEnter = true;
-				playerPressedEnter(0);
-				player0Fin = true;
+				player0Fin = playerPressedEnter(0);
 			}
 			if(key == KeyEvent.VK_P && !isPass)
 			{
 				isPass = true;
-				playerPressedPass(0);
-				player0Fin = true;
+				player0Fin = playerPressedPass(0);
 			}
 		}
 		@Override

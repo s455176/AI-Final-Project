@@ -42,23 +42,33 @@ public class Card extends JLabel implements Comparable<Card>
 	public String toString()
 	{
 		String s = new String();
+		
+		if(suit == 0 && rank == 0)
+			return "JOKER";
+		
 		switch(suit)
 		{
 		case Constant.DIAMOND:
-			s = "DIAMOND";
+			s = "\u2666";
 			break;
 		case Constant.CLUB:
-			s = "CLUB";
+			s = "\u2663";
 			break;
 		case Constant.HEART:
-			s = "HEART";
+			s = "\u2665";
 			break;
 		case Constant.SPADE:
-			s = "SPADE";
+			s = "\u2660";
 			break;
 		}
-		return "Suit: " + s + ", Rank: " + this.rank + ", Index:" + this.index;
+		return s + this.rank;
 	}
+	
+	public boolean isJoker()
+	{
+		return suit == 0 && rank == 0;
+	}
+	
 	public int getSuit()
     {
         return suit;
@@ -69,7 +79,7 @@ public class Card extends JLabel implements Comparable<Card>
     }
     public int getValue()
     {
-        if (rank == 0)
+        if (rank == 0 && suit == 0)
         {
             return 16;
         }

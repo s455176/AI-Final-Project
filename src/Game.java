@@ -24,6 +24,9 @@ public class Game extends JPanel implements ActionListener
 	private int numChoose;
 	private boolean player0Fin;
 	
+	// B01902018
+	public PlayerGameState gameState;
+	
 	// method 
 	/**
 	 * Constructor of the game
@@ -55,6 +58,9 @@ public class Game extends JPanel implements ActionListener
 		isRoundEnd = false;
 		timer = new Timer(10, this);
         timer.start();
+		
+		// B01902018
+		gameState = new PlayerGameState();
 	}
 	public void reset()
 	{

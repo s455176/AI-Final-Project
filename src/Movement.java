@@ -27,6 +27,14 @@ public class Movement
 			}
 		}
 	}
+	
+	// B01902018
+	public Movement()
+	{
+		cards = null;
+		numCards = 0;
+	}
+	
 	/**
 	 * get the cards of the movement 
 	 * 

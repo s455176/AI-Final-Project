@@ -7,6 +7,7 @@ public interface Constant
 	    static final int CLUB = 3;
 	    static final int HEART = 1;
 	    static final int SPADE = 0;
+		static final int JOKER = 4;
 	    
 	    static final int JACK = 11;
 	    static final int QUEEN = 12;
@@ -41,6 +42,7 @@ public interface Constant
 	    static final int revoLabelY = 100;
 	    
 	    // Different combinations of cards
+		static final int NEWROUND  = -1;
         static final int ILLEGAL   = 0;
         static final int SINGLE    = 1;
         static final int PAIR      = 2;
@@ -49,5 +51,5 @@ public interface Constant
         static final int STRAIGHT3 = 5;
         static final int STRAIGHT4 = 6;
         static final int STRAIGHT5 = 7;
-        static final int PASS      = 8;
+		static final int PASS      = 8;
 }

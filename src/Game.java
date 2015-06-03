@@ -4,8 +4,11 @@ import java.awt.event.*;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.PrintStream;
+//import java.io.PrintStream;
+import java.io.*;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Game extends JPanel implements ActionListener
 {
@@ -26,12 +29,17 @@ public class Game extends JPanel implements ActionListener
 	
 	// B01902018
 	public PlayerGameState gameState;
-	
+
+    // for recording game log
+    private PrintWriter gameLog;
+    private List<List<String>> playerMoves;
+    private int[] playedCards;
+
 	// method 
 	/**
 	 * Constructor of the game
 	 */
-	public Game()
+	public Game() throws IOException
 	{
 		gui = new GUIResource(this);
 		setFocusable(true);
@@ -62,6 +70,11 @@ public class Game extends JPanel implements ActionListener
 		
 		// B01902018
 		gameState = new PlayerGameState();
+
+        // Open a file to record game state for machine learning.
+        gameLog = new PrintWriter(new BufferedWriter(new FileWriter("gameLog.txt", true)));
+        playedCards = new int[53];
+        playerMoves = new ArrayList<List<String>>(4);
 	}
 	public void reset()
 	{

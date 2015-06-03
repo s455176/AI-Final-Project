@@ -2,6 +2,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class Card extends JLabel implements Comparable<Card>
 {
@@ -104,7 +105,7 @@ public class Card extends JLabel implements Comparable<Card>
 	}
 	
 	// B01902018
-	public ArrayList<Movement> getCombination(int startIndex, ArrayList<int>cardsIndex, int cardCombination)
+	public ArrayList<Movement> getCombination(int startIndex, ArrayList<Card> cardsIndex, int cardCombination)
 	{
 		ArrayList<Movement> moves = new ArrayList<Movement>();
 		int temp;
@@ -205,8 +206,10 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp5 = new Card[3];
 					for (int i = 0; i < 3; i++)
 						temp5[i] = new Card(startIndex + i);
+                    moves.add(new Movement(temp5));
 				}
-				moves.add(new Movement(temp5));
+                // ERROR: Undefind in this domain.
+				//moves.add(new Movement(temp5));
 				if (cardCombination > -1)
 					break;
 			case 6:
@@ -223,8 +226,10 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp6 = new Card[4];
 					for (int i = 0; i < 4; i++)
 						temp6[i] = new Card(startIndex + i);
+                    moves.add(new Movement(temp6));
 				}
-				moves.add(new Movement(temp6));
+                // ERROR: Undefind in this domain.
+				//moves.add(new Movement(temp6));
 				if (cardCombination > -1)
 					break;
 			case 7:
@@ -241,8 +246,10 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp7 = new Card[5];
 					for (int i = 0; i < 5; i++)
 						temp7[i] = new Card(startIndex + i);
+                    moves.add(new Movement(temp7));
 				}
-				moves.add(new Movement(temp7));
+                // ERROR: Undefind in this domain.
+				//moves.add(new Movement(temp7));
 				break;
 		}
 		

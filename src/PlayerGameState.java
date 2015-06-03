@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class PlayerGameState
 {
 	//private Movement[] history;
@@ -11,7 +13,9 @@ public class PlayerGameState
 	public PlayerGameState()
 	{
 		history = new ArrayList<Movement>();
-		cardCombination = NEWROUND;
+        // ERROR: Undefined NEWROUND
+		//cardCombination = NEWROUND;
+		cardCombination = 0;
 		cards = new boolean[53];
 		for (int i = 0; i < 53; i++)
 			cards[i] = true;
@@ -70,15 +74,17 @@ public class PlayerGameState
 		
 		return false;
 	}
-	public int getValue();
+    // Undefined method.
+	//public int getValue();
 	public PlayerGameState getPlayerGameState(Movement movement)
 	{
 		PlayerGameState playerGameState = new PlayerGameState(this.history, this.cardCombination, this.cards, this.pass, this.revolution, this.tempRev);
 		playerGameState.history.add(movement);
 		if (movement.numCards == 0)
 			playerGameState.pass += 1;
-		else
-			playerGameState = 0;
+        // ERROR: Incompatible type
+		//else
+		//	playerGameState = 0;
 		if (playerGameState.pass == 3)
 		{
 			playerGameState.cardCombination = -1;

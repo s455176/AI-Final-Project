@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class Player 
 {
@@ -14,7 +15,7 @@ public class Player
 	 * @param game the game which player is playing 
 	 * @param index the index of the player in the game
 	 */
-	public Player(Game game, int index)
+	public Player(Game game, int index) throws IOException
 	{
 		this.index = index;
 		hand = new Card[Constant.numMaxHandCard];
@@ -500,7 +501,7 @@ public class Player
 	}
 	
 	// unit test
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		Game g = new Game();
 		Player p = new Player(g, 0);

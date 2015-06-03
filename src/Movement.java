@@ -6,6 +6,8 @@ public class Movement
 	public int numCards;
 	public int type;
 	public int biggestRank;
+	public boolean has8Cut, has11Revo, is4CardsRevo;
+	
 	/**
 	 * Constructor of the Movement
 	 * 
@@ -15,6 +17,9 @@ public class Movement
 	{
 		if(cards.length < 0 || cards.length > Constant.maxMovementCard)
 		{
+			has11Revo = false;
+			is4CardsRevo = false;
+			has8Cut = false;
 			type = Constant.ILLEGAL;
 			biggestRank = -1;
 			cards = null;
@@ -32,7 +37,13 @@ public class Movement
 				{
 					SystemFunc.throwException("null card in Movement construct");
 				}
+				
+				if((this.cards[i].getIndex() - 1) % 13 + 1 == 8)
+					has8Cut = true;
+				if((this.cards[i].getIndex() - 1) % 13 + 1 == 11)
+					has11Revo = true;
 			}
+			is4CardsRevo = (this.numCards >= 4);
 			Arrays.sort(this.cards, 0, this.numCards);
 			Card[] tempCards = getCards();
 			this.type = Rule.combination(tempCards);

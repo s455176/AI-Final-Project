@@ -36,6 +36,10 @@ public interface Constant
 	    static final int[][] playerPassLabel = new int[][] {{450, 350}, {800, 210}, {450, 120}, {180, 210}};
 	    static final int passLabelWidth = 100;
 	    static final int passLabelHeight = 80;
+	    static final int revoLabelWidth = 200;
+	    static final int revoLabelHeight = 80;
+	    static final int revoLabelX = 600;
+	    static final int revoLabelY = 100;
 	    
 	    // Different combinations of cards
 		static final int NEWROUND  = -1;

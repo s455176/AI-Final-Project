@@ -11,6 +11,7 @@ public class GUIResource
 	private Game game;
 	public JLabel[][] cardBack;
 	public JLabel[] passLabel;
+	public JLabel revolution;
 
 	// method 
 	/**
@@ -49,6 +50,13 @@ public class GUIResource
 			passLabel[i].setForeground(Color.yellow);
 			passLabel[i].setLocation(Constant.playerPassLabel[i][0], Constant.playerPassLabel[i][1]);
 		}
+		Font revoFont = new Font("Batang", Font.ITALIC, 20);
+		revolution = new JLabel("Revolution!");
+		revolution.setSize(Constant.revoLabelWidth, Constant.revoLabelHeight);
+		revolution.setFont(revoFont);
+		revolution.setForeground(Color.green);
+		revolution.setLocation(Constant.revoLabelX, Constant.revoLabelY);
+		
 		this.game = game;
 	}
 	/**

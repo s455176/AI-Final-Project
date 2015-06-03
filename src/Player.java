@@ -233,7 +233,7 @@ public class Player
 				if(k - j == length)
 				{
 					Movement m = new Movement(c);
-					if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+					if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 						ll.add(m);
 				}
 			}
@@ -270,7 +270,7 @@ public class Player
 								c[0] = shrinkHand[allCards[i * 4 + j]];
 								c[1] = shrinkHand[allCards[i * 4 + k]];
 								Movement m = new Movement(c);
-								if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+								if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 									ll.add(m);
 							}
 								
@@ -295,7 +295,7 @@ public class Player
 						if(count == 3)
 						{
 							Movement m = new Movement(c);
-							if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+							if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 								ll.add(m);
 						}
 					}
@@ -308,7 +308,7 @@ public class Player
 						c[j] = shrinkHand[allCards[i * 4 + j]];
 					}
 					Movement m = new Movement(c);
-					if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+					if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 						ll.add(m);
 				}
 			}
@@ -321,7 +321,7 @@ public class Player
 			Card[] c = new Card[1];
 			c[0] = shrinkHand[i];
 			Movement m = new Movement(c);
-			if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+			if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 				ll.add(m);
 		}
 		if(hasJoker)
@@ -329,7 +329,7 @@ public class Player
 			Card[] c = new Card[1];
 			c[0] = joker;
 			Movement m = new Movement(c);
-			if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+			if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 				ll.add(m);
 		}
 	}
@@ -375,7 +375,7 @@ public class Player
 					if(k - j == length)
 					{
 						Movement m = new Movement(c);
-						if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+						if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 							ll.add(m);
 						// System.out.println(m);
 					}
@@ -411,7 +411,7 @@ public class Player
 				{
 					c[newLength] = joker;
 					Movement m = new Movement(c);
-					if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+					if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 						ll.add(m);
 					// System.out.println(m);
 				}
@@ -450,7 +450,7 @@ public class Player
 							c[0] = shrinkHand[allCards[i * 4 + j]];
 							c[1] = joker;
 							Movement m = new Movement(c);
-							if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+							if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 								ll.add(m);
 						}
 					}
@@ -466,7 +466,7 @@ public class Player
 								c[1] = shrinkHand[allCards[i * 4 + k]];
 								c[2] = joker;
 								Movement m = new Movement(c);
-								if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+								if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 									ll.add(m);
 							}
 				}
@@ -491,7 +491,7 @@ public class Player
 						{
 							c[count] = joker;
 							Movement m = new Movement(c);
-							if(Rule.isLegalMove(m, showMove, false, game.getIsStartGame()))
+							if(Rule.isLegalMove(m, showMove, game.getIsRevo(), game.getIsStartGame()))
 								ll.add(m);
 						}
 					}

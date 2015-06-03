@@ -18,6 +18,7 @@ public class Game extends JPanel implements ActionListener
 	private Movement showMove;
 	private boolean isGameEnd, isRoundEnd, isStartGame;
 	public boolean[] isPlayerPassed;
+	private boolean isRevo, is11Revo;
 	
 	// for player 0
 	private boolean[] choose;
@@ -54,6 +55,8 @@ public class Game extends JPanel implements ActionListener
 		isGameEnd = false;
 		isRoundEnd = false;
 		isStartGame = true;
+		isRevo = false;
+		is11Revo = false;
 		timer = new Timer(10, this);
         timer.start();
 	}
@@ -74,9 +77,16 @@ public class Game extends JPanel implements ActionListener
 		isGameEnd = false;
 		isStartGame = true;
 		isRoundEnd = false;
+		isRevo = false;
+		is11Revo = false;
 		deck.shuffle();
 	}
 	
+	
+	public boolean getIsRevo()
+	{
+		return isRevo;
+	}
 	
 	public boolean getIsStartGame()
 	{
@@ -175,7 +185,7 @@ public class Game extends JPanel implements ActionListener
 			}
 			Movement move = new Movement(chosenCard);
 			// cannot do the illegal move
-			if(!Rule.isLegalMove(move, showMove, false, isStartGame))
+			if(!Rule.isLegalMove(move, showMove, getIsRevo(), isStartGame))
 			{
 				return false;
 			}
@@ -207,7 +217,7 @@ public class Game extends JPanel implements ActionListener
 			Card[] pass = new Card[0];
 			Movement passMovement = new Movement(pass);
 			// cannot do the illegal move
-			if(!Rule.isLegalMove(passMovement, showMove, false, isStartGame))
+			if(!Rule.isLegalMove(passMovement, showMove, getIsRevo(), isStartGame))
 			{
 				return false;
 			}
@@ -226,7 +236,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public void doMove(Movement move, int playerIndex)
 	{
-		if(!Rule.isLegalMove(move, showMove, false, isStartGame))
+		if(!Rule.isLegalMove(move, showMove, getIsRevo(), isStartGame))
 		{
 			SystemFunc.throwException("Illegal Move by player " + playerIndex);
 		}
@@ -246,14 +256,35 @@ public class Game extends JPanel implements ActionListener
 			}
 			// draw the cards show in the middle
 			drawShowCards(move);
+			if(move.is4CardsRevo)
+			{
+				System.out.println("4 cards Revo");
+				isRevo = !isRevo;
+				is11Revo = false;
+			}
+			else if(move.has11Revo)
+			{
+				System.out.println("11 Revo");
+				isRevo = !isRevo;
+				is11Revo = true;
+			}
 			resetPass();
 		}
+		drawRevo();
 		// repaint();
 	}
 	private void drawPlayerPass(int playerIndex)
 	{
 		System.out.println("player pass");
 		add(gui.passLabel[playerIndex], 0);
+	}
+	
+	public void drawRevo()
+	{
+		if(isRevo)
+			add(gui.revolution);
+		else
+			remove(gui.revolution);
 	}
 	
 	private void removeShowCards()
@@ -339,12 +370,21 @@ public class Game extends JPanel implements ActionListener
 	public void run()
 	{
 		int turn = deal();
+		boolean isRevoBeforeRound = false;
 		while(!isGameEnd)
 		{
+			isRevoBeforeRound = isRevo;
 			turn = runRound(turn);
 			System.out.println("========Round end");
 			// remove the show cards in the middle
 			removeShowCards();
+			// if 11 Revo happen in this round then need reset the isRevo
+			if(is11Revo)
+			{
+				isRevo = isRevoBeforeRound;
+				is11Revo = false;
+			}
+			drawRevo();
 			// repaint();
 			SystemFunc.sleep(2000);
 			if(numRemainPlayer() == 1)
@@ -365,7 +405,7 @@ public class Game extends JPanel implements ActionListener
 	public void waitPlayer0()
 	{
 		// System.out.println("Sleep");
-		SystemFunc.sleep(1000);
+		SystemFunc.sleep(500);
 	}
 
 	public void resetPass()
@@ -418,6 +458,7 @@ public class Game extends JPanel implements ActionListener
 		int turn = initTurn; /*note that the player who is the first player in the round is not allowed to pass*/
 		int nextRoundStart = -1;
 		isRoundEnd = false;
+		int turn11Record = -1;
 		
 		// start the round 
 		while(!isRoundEnd)
@@ -435,7 +476,8 @@ public class Game extends JPanel implements ActionListener
 				break;
 			}
 			// player decide a movement
-			System.out.println("turn " + turn + ", isGameStart: " + isStartGame);
+			System.out.println("turn " + turn + ", isGameStart: " + isStartGame + ", is11Revo: " + is11Revo + 
+					", isRevo: " + isRevo);
 			if(turn == 0)
 			{
 				addKeyListener(keyController);
@@ -457,6 +499,13 @@ public class Game extends JPanel implements ActionListener
 				// a player has no hand cards after do a non-pass movement (ie, this player finishes)
 				isRoundEnd = true;
 				nextRoundStart = findNextPlayerWithHandCards(turn);
+				break;
+			}
+			else if(!isPlayerPassed[turn] && showMove.has8Cut)
+			{
+				// a player plays a combination which is 8 cut
+				isRoundEnd = true;
+				nextRoundStart = turn;
 				break;
 			}
 			if(isPlayerPassed[turn])

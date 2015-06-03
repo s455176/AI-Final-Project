@@ -74,6 +74,7 @@ public class Game extends JPanel implements ActionListener
         // Open a file to record game state for machine learning.
         gameLog = new PrintWriter(new BufferedWriter(new FileWriter("gameLog.txt", true)));
         playedCards = new int[53];
+        Arrays.fill(playedCards, 0); // Init to zeros;
         playerMoves = new ArrayList<List<String>>(4);
 	}
 	public void reset()
@@ -249,6 +250,21 @@ public class Game extends JPanel implements ActionListener
 		{
 			SystemFunc.throwException("Illegal Move by player " + playerIndex);
 		}
+        // Record the move if Constant.RECORDING is set to true.
+        else
+        {
+            if (Constant.RECORDING)
+            {
+                Card[] cards = move.getCards();
+                // Update the played cards
+                for (Card c : cards)
+                {
+                    playedCards[c.getIndex()] += 1;
+                }
+                System.out.println(toLogString(move, playerIndex));
+                //playerMoves.get(playerIndex).add(s);
+            }
+        }
 		// move with 0 cards means player do the "pass" movement
 		if(move.type == Constant.PASS) 
 		{
@@ -269,6 +285,30 @@ public class Game extends JPanel implements ActionListener
 		}
 		// repaint();
 	}
+    private String toLogString(Movement move, int playerIndex)
+    {
+        String s = "";
+        Card[] cards = players[playerIndex].hand;
+        int[] inHand = new int[13];
+        for (Card c : cards)
+        {
+            if (c == null) continue;
+            inHand[c.getRank()] += 1;
+        }
+        for (int i = 0; i < 13; ++i)
+        {
+            // LIBSVM data format for a attritube like this
+            // 1 0 2 0
+            // is represented as 
+            // 1:1 3:2
+            if (inHand[i] > 0)
+            {
+                s += i + ":" + inHand[i] + " ";
+            }
+        }
+        System.out.println(s);
+        return s;
+    }
 	private void drawPlayerPass(int playerIndex)
 	{
 		System.out.println("player pass");

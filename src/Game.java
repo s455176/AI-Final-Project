@@ -31,11 +31,11 @@ public class Game extends JPanel implements ActionListener
 	// B01902018
 	public PlayerGameState gameState;
 
-    // for recording game log
-    private PrintWriter gameLog;
-    private List<List<String>> playerMoves;
-    private int[] playedCards;
-    private boolean hasWinner;
+	// for recording game log
+	private PrintWriter gameLog;
+	private List<List<String>> playerMoves;
+	private int[] playedCards;
+	private boolean hasWinner;
 
 	// method 
 	/**
@@ -70,22 +70,22 @@ public class Game extends JPanel implements ActionListener
 		isRevo = false;
 		is11Revo = false;
 		timer = new Timer(10, this);
-        timer.start();
+		timer.start();
 		
 		// B01902018
 		gameState = new PlayerGameState();
 
-        // Open a file to record game state for machine learning.
-        gameLog = new PrintWriter(new BufferedWriter(new FileWriter("gameLog.txt", true)));
-        playedCards = new int[14];
-        Arrays.fill(playedCards, 0); // Init to zeros;
-        playerMoves = new ArrayList<List<String>>(4);
-        for (int i = 0; i < 4; ++i)
-        {
-            // Record each players' moves.
-            playerMoves.add(new ArrayList<String>());
-        }
-        hasWinner = false;
+		// Open a file to record game state for machine learning.
+		gameLog = new PrintWriter(new BufferedWriter(new FileWriter("gameLog.txt", true)));
+		playedCards = new int[14];
+		Arrays.fill(playedCards, 0); // Init to zeros;
+		playerMoves = new ArrayList<List<String>>(4);
+		for (int i = 0; i < 4; ++i)
+		{
+			// Record each players' moves.
+			playerMoves.add(new ArrayList<String>());
+		}
+		hasWinner = false;
 	}
 	public void reset()
 	{
@@ -267,32 +267,33 @@ public class Game extends JPanel implements ActionListener
 		{
 			SystemFunc.throwException("Illegal Move by player " + playerIndex);
 		}
-        // Record the move if Constant.RECORDING is set to true.
-        else
-        {
-            if (Constant.RECORDING)
-            {
-                Card[] cards = move.getCards();
-                // Update the played cards
-                for (Card c : cards)
-                {
-                    playedCards[ c.getRank() ] += 1;
-                }
-                playerMoves.get(playerIndex).add( toLogString(move, playerIndex) );
-            }
-            if (!hasWinner && players[playerIndex].numHandCards == 0)
-            {
-                for (int i = 0; i < 4; ++i)
-                {
-                    int label = (i == playerIndex) ? 1 : 0;
-                    for (String s : playerMoves.get(i))
-                    {
-                        gameLog.println("" + label + " " + s);
-                    }
-                }
-                gameLog.flush();
-            }
-        }
+		// Record the move if Constant.RECORDING is set to true.
+		else
+		{
+			if (Constant.RECORDING)
+			{
+				Card[] cards = move.getCards();
+				// Update the played cards
+				for (Card c : cards)
+				{
+					playedCards[ c.getRank() ] += 1;
+				}
+				playerMoves.get(playerIndex).add( toLogString(move, playerIndex) );
+			}
+			if (!hasWinner && players[playerIndex].numHandCards == 0)
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					int label = (i == playerIndex) ? 1 : 0;
+					for (String s : playerMoves.get(i))
+					{
+						gameLog.println("" + label + " " + s);
+					}
+				}
+				gameLog.flush();
+				hasWinner = true;
+			}
+		}
 		// move with 0 cards means player do the "pass" movement
 		if(move.type == Constant.PASS) 
 		{
@@ -326,54 +327,57 @@ public class Game extends JPanel implements ActionListener
 		drawRevo();
 		// repaint();
 	}
-    /** 
-     * A function that transfer player's current move into a
-     * LIBSVM data fromat.
-     * First 14 attritubes record player's hand (number of
-     * joker, Ace, 2...). Attritubes 15~29 record the played
-     * cards in game so far. And save as a sparse array.
-     *
-     * LIBSVM data format for a attritube like this
-     * 1 0 2 0
-     * is represented as 
-     * 1:1 3:2
-     *
-     * @param move the current player's move.
-     * @param playerIndex the player who play this move.
-     * @return String, a LIBSVM sparse data format showing 
-     *            current player's movement and game state.
-     */
-    private String toLogString(Movement move, int playerIndex)
-    {
-        String s = "";
-        Card[] cards = players[playerIndex].hand;
-        int[] inHand = new int[14];
-        // Cards in player's hand.
-        for (Card c : cards)
-        {
-            if (c == null) continue;
-            inHand[ c.getRank() ] += 1; // Rank 0~13
-        }
-        // Transfer how many card left to data format.
-        for (int i = 0; i < 14; ++i)
-        {
-            if (inHand[i] > 0)
-            {
-                // for cards in hand, attribute index from 1~14
-                s += Integer.toString(i+1) + ":" + inHand[i] + " ";
-            }
-        }
-        // Cards that has been played in this game.
-        for (int i = 0; i < 14; ++i)
-        {
-            if (playedCards[i] > 0)
-            {
-                // attribute index start from 15
-                s += Integer.toString(i + 15) + ":" + playedCards[i] + " ";
-            }
-        }
-        return s;
-    }
+	/** 
+	 * A function that transfer player's current move into a
+	 * LIBSVM data fromat.
+	 * First 14 attritubes record player's hand (number of
+	 * joker, Ace, 2...). Attritubes 15~29 record the played
+	 * cards in game so far. And save as a sparse array.
+	 *
+	 * LIBSVM data format for a attritube like this
+	 * 1 0 2 0
+	 * is represented as 
+	 * 1:1 3:2
+	 *
+	 * @param move the current player's move.
+	 * @param playerIndex the player who play this move.
+	 * @return String, a LIBSVM sparse data format showing 
+	 *		current player's movement and game state.
+	 */
+	private String toLogString(Movement move, int playerIndex)
+	{
+		String s = "";
+		Card[] cards = players[playerIndex].hand;
+		int[] inHand = new int[14];
+		// Cards in player's hand.
+		for (Card c : cards)
+		{
+			if (c == null) continue;
+			inHand[ c.getRank() ] += 1; // Rank 0~13
+		}
+		// Transfer how many card left to data format.
+		for (int i = 0; i < 14; ++i)
+		{
+			if (inHand[i] > 0)
+			{
+				// for cards in hand, attribute index from 1~14
+				s += Integer.toString(i+1) + ":" + inHand[i] + " ";
+			}
+		}
+		// Cards that has been played in this game.
+		for (int i = 0; i < 14; ++i)
+		{
+			if (playedCards[i] > 0)
+			{
+				// attribute index start from 15
+				s += Integer.toString(i + 15) + ":" + playedCards[i] + " ";
+			}
+		}
+                if (isRevo) s += "29:1 ";
+                if (is11Revo) s += "30:1 ";
+
+		return s;
+	}
 	private void drawPlayerPass(int playerIndex)
 	{
 		System.out.println("player pass");
@@ -621,8 +625,8 @@ public class Game extends JPanel implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-        repaint();  
-    }
+		repaint();  
+	}
 	
 	@Override
 	public void paintComponent(Graphics g)

@@ -71,33 +71,33 @@ public class Card extends JLabel implements Comparable<Card>
 	}
 	
 	public int getSuit()
-    {
-        return suit;
-    }
-    public int getRank()
-    {
-        return rank;
-    }
-    public int getValue()
-    {
-        if (rank == 0 && suit == 0)
-        {
-            return 16;
-        }
-        return (rank < 3) ? rank + 13 : rank;
-    }
-    public int getIndex()
-    {
-    	return index;
-    }
-    public boolean hasSameRank(Card c)
-    {
-        return (this.rank == c.rank) ? true : false;
-    }
-    public boolean hasSameSuit(Card c)
-    {
-        return (this.suit == c.suit) ? true : false;
-    }
+	{
+		return suit;
+	}
+	public int getRank()
+	{
+		return rank;
+	}
+	public int getValue()
+	{
+		if (rank == 0 && suit == 0)
+		{
+			return 16;
+		}
+		return (rank < 3) ? rank + 13 : rank;
+	}
+	public int getIndex()
+	{
+		return index;
+	}
+	public boolean hasSameRank(Card c)
+	{
+		return (this.rank == c.rank) ? true : false;
+	}
+	public boolean hasSameSuit(Card c)
+	{
+		return (this.suit == c.suit) ? true : false;
+	}
 	public int compareTo(Card c)
 	{
 		//return (this.index > c.index)? 1: -1;
@@ -206,9 +206,9 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp5 = new Card[3];
 					for (int i = 0; i < 3; i++)
 						temp5[i] = new Card(startIndex + i);
-                    moves.add(new Movement(temp5));
+					moves.add(new Movement(temp5));
 				}
-                // ERROR: Undefind in this domain.
+				// ERROR: Undefind in this domain.
 				//moves.add(new Movement(temp5));
 				if (cardCombination > -1)
 					break;
@@ -226,9 +226,9 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp6 = new Card[4];
 					for (int i = 0; i < 4; i++)
 						temp6[i] = new Card(startIndex + i);
-                    moves.add(new Movement(temp6));
+					moves.add(new Movement(temp6));
 				}
-                // ERROR: Undefind in this domain.
+				// ERROR: Undefind in this domain.
 				//moves.add(new Movement(temp6));
 				if (cardCombination > -1)
 					break;
@@ -246,9 +246,9 @@ public class Card extends JLabel implements Comparable<Card>
 					Card[] temp7 = new Card[5];
 					for (int i = 0; i < 5; i++)
 						temp7[i] = new Card(startIndex + i);
-                    moves.add(new Movement(temp7));
+					moves.add(new Movement(temp7));
 				}
-                // ERROR: Undefind in this domain.
+				// ERROR: Undefind in this domain.
 				//moves.add(new Movement(temp7));
 				break;
 		}

@@ -107,6 +107,15 @@ public class Game extends JPanel implements ActionListener
 		isRevo = false;
 		is11Revo = false;
 		deck.shuffle();
+
+                Arrays.fill(playedCards, 0);
+		playerMoves = new ArrayList<List<String>>(4);
+		for (int i = 0; i < 4; ++i)
+		{
+			// Record each players' moves.
+			playerMoves.add(new ArrayList<String>());
+		}
+		hasWinner = false;
 	}
 	
 	

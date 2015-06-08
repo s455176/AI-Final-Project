@@ -14,11 +14,7 @@ public class Game extends JPanel implements ActionListener
 {
 	// attribute
 	private Timer timer;
-	/*
-	 * cur public to test GameState, if i forget to set it back to private, please someone help me to set it back and then delete
-	 * this comment!!
-	 * */
-	public Player[] players; // player 0 is the human player 
+	private Player[] players; // player 0 is the human player 
 	private Deck deck;
 	private GUIResource gui;
 	private KeyController keyController;
@@ -26,6 +22,9 @@ public class Game extends JPanel implements ActionListener
 	private boolean isGameEnd, isRoundEnd, isStartGame;
 	public boolean[] isPlayerPassed;
 	private boolean isRevo, is11Revo;
+	
+	// test GameState 
+//	public GameState gs;
 	
 	// for player 0
 	private boolean[] choose;
@@ -283,6 +282,12 @@ public class Game extends JPanel implements ActionListener
 		// Record the move if Constant.RECORDING is set to true.
 		else
 		{
+			// test GameState
+//			if(!gs.doMove(playerIndex, move))
+//			{
+//				SystemFunc.throwException("Illegal Move Occur in GameState");
+//			}
+			
 			if (Constant.RECORDING)
 			{
 				Card[] cards = move.getCards();
@@ -489,6 +494,12 @@ public class Game extends JPanel implements ActionListener
 	{
 		int turn = deal();
 		boolean isRevoBeforeRound = false;
+		
+		// test GameState
+//		gs = new GameState(players[0].hand, showMove, isRevo, is11Revo, turn, GameState.initHistory(), 0, true, 0, 
+//				Constant.numPlayer, new int[]{players[0].numHandCards, players[1].numHandCards, players[2].numHandCards, players[3].numHandCards}, 
+//				false);
+		
 		while(!isGameEnd)
 		{
 			isRevoBeforeRound = isRevo;
@@ -586,6 +597,7 @@ public class Game extends JPanel implements ActionListener
 				turn = (turn + 1) % Constant.numPlayer;
 				continue;
 			}
+			
 			// all other players pass
 			if(passCount == numRemainPlayer() - 1)
 			{

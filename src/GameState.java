@@ -4,17 +4,17 @@ import java.util.*;
 public class GameState
 {
 	// attribute of normal game need
-	private int index;
-	private Card[] playerHand;
-	private Movement showMove;
-	private boolean isRevo, is11Revo, isStartGame;
-	private int[] numCards;
+	public int index;
+	public Card[] playerHand;
+	public Movement showMove;
+	public boolean isRevo, is11Revo, isStartGame;
+	public int[] numCards;
 	
 	// attribute of the control flow 
-	private int next;
-	private boolean[] history; // record the card that is shown, indexing by the card's index (size is the Constant.MAX_NUM_CARD)
-	private int passCount, remainPlayer;
-	private boolean lastRoundRevo;
+	public int next;
+	public boolean[] history; // record the card that is shown, indexing by the card's index (size is the Constant.MAX_NUM_CARD)
+	public int passCount, remainPlayer;
+	public boolean lastRoundRevo;
 	
 	// used for a new game and assume dealing starts from player 0
 	public GameState(Card[] hand, int n, int indx)
@@ -22,6 +22,13 @@ public class GameState
 		this(hand, null, false, false, n, initHistory(), indx, true, 0, 4, new int[]{Constant.numMaxHandCard - 1, 
 			Constant.numMaxHandCard - 2, Constant.numMaxHandCard - 2, Constant.numMaxHandCard - 2}, false);
 	}
+	
+	public GameState(GameState gs)
+	{
+		this(gs.playerHand, gs.showMove, gs.isRevo, gs.is11Revo, gs.next, gs.history, gs.index, gs.isStartGame, 
+				gs.passCount, gs.remainPlayer, gs.numCards, gs.lastRoundRevo);
+	}
+	
 	
 	public GameState(Card[] hand, Movement show, boolean revo, boolean revo11, int n, boolean[] record, int indx, 
 			boolean start, int pass, int remain, int[] num, boolean lastRevo)
@@ -68,7 +75,7 @@ public class GameState
 			numCards[i] = num[i];
 	}
 	
-	private static boolean[] initHistory()
+	public static boolean[] initHistory()
 	{
 		boolean[] temp = new boolean[Constant.MAX_NUM_CARD];
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
@@ -124,6 +131,8 @@ public class GameState
 				next = findNext(playerIndex);
 				resetNewRoundRevo();
 			}
+			else
+				next = findNext(playerIndex);
 		}
 		else
 		{
@@ -156,10 +165,10 @@ public class GameState
 				resetNewRoundRevo();
 			}
 			else
-			{
 				next = findNext(playerIndex);
-			}
 		}
+		isStartGame = false;
+		
 		
 		System.out.println(this);
 		
@@ -168,15 +177,18 @@ public class GameState
 	
 	public String toString()
 	{
-		String s = "";
+		String s = "=========================================\n";
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
 			s += "player " + i + ": " + numCards[i] + ", ";
 		}
 		s += "\n";
-		s += "showMove: " + showMove.toString();
+		if(showMove != null)
+			s += "showMove: " + showMove.toString();
 		s += "isRevo: " + isRevo + ", is11Revo: " + is11Revo + "\n";
+		s += "nextPlayer: " + next + "\n";
 		
+		s += "++++++++++++++++++++++++++++++++++++++++++++";
 		return s;
 	}
 	
@@ -205,16 +217,6 @@ public class GameState
 			i = (i + 1) % Constant.numPlayer;
 		}
 		return nextStartTurn;
-	}
-	
-	// unit test 
-	public static void main(String[] args) throws IOException
-	{
-		Game g = new Game();
-		g.deal();
-		GameState gs = new GameState(g.players[0].hand, 0, 0);
-		
-		LinkedList<Movement> ll = g.players[0].genLegalMove(gs.showMove);
 	}
 }
 

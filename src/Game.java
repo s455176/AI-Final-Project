@@ -14,7 +14,11 @@ public class Game extends JPanel implements ActionListener
 {
 	// attribute
 	private Timer timer;
-	private Player[] players; // player 0 is the human player
+	/*
+	 * cur public to test GameState, if i forget to set it back to private, please someone help me to set it back and then delete
+	 * this comment!!
+	 * */
+	public Player[] players; // player 0 is the human player 
 	private Deck deck;
 	private GUIResource gui;
 	private KeyController keyController;

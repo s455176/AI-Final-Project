@@ -4,6 +4,27 @@ import java.util.ArrayList;
 
 public class Rule implements Constant
 {
+	public static int[] valueToIndexMap;
+	
+	static
+	{
+		valueToIndexMap = new int[53];
+		for(int i = 1; i <= 52; i++)
+		{
+			int suit = (i - 1) / 13;
+			int rank = i - suit * 13;
+			int value = (rank < 3) ? rank + 13 : rank;
+			valueToIndexMap[(value - 2) + suit * 13] = i;
+		}
+//		for(int i = 52; i >= 1; --i)
+//		{
+//			Card c = new Card(valueToIndexMap[i]);
+//			System.out.print(c);
+//			if((i - 1) % 13 == 0)
+//				System.out.println();
+//		}
+	}
+	
     /**
      * Return a type in Constant.java that shows which combiantion the 
      * cards is.
@@ -145,9 +166,6 @@ public class Rule implements Constant
         	}
         }
 
-        // TODO: whether to handle pass here?
-        // Should (lastMove != null && playMove == null) return true?
-
         int lastType = lastMove.type;
         int playType = playMove.type; 
         if (playType == ILLEGAL)
@@ -163,9 +181,13 @@ public class Rule implements Constant
         if (lastType == playType)
         {
             // Same type of combination, compare the biggest cards.
-            if (playBiggest > lastBiggest)
+            if (playBiggest > lastBiggest && !isRevo)
             {
                 legal = true;
+            }
+            else if(playBiggest < lastBiggest && isRevo)
+            {
+            	legal = true;
             }
         }
         else
@@ -175,7 +197,7 @@ public class Rule implements Constant
             return false;
         }
         // If it's in revolution, big means small, and small means big.
-        return (isRevo) ? (!legal) : legal;
+        return legal;
     }
 
     /**
@@ -221,15 +243,15 @@ public class Rule implements Constant
         //Brute force search for best replace card.
         for (int bestType = 7; bestType >= 1; --bestType)
         {
-            for (int i = 52; i > 0; --i)
+            for (int i = 52; i >= 1; --i)
             {
-                newCards[pos] = new Card(i);
+                newCards[pos] = new Card(valueToIndexMap[i]);
                 System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
                 Arrays.sort(sortedNewCards);
                 int type = combination(sortedNewCards);
                 if (type == bestType){
                 	// System.out.println(type);
-                    return new Card(i);
+                    return new Card(valueToIndexMap[i]);
                 }
             }
         }        

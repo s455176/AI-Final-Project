@@ -87,7 +87,7 @@ public class GameState
 	public boolean doMove(int playerIndex, Movement move)
 	{	
 		// not the player_playerIndex's turn
-		System.out.println(move);
+		// System.out.println(move);
 		if(playerIndex != next)
 		{
 			SystemFunc.throwException("GameState doMove: not the player_playerIndex's turn, playerIndex: " + 
@@ -181,8 +181,7 @@ public class GameState
 		}
 		isStartGame = false;
 		
-		
-		System.out.println(this);
+		// System.out.println(this);
 		
 		return true;
 	}

@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class MCTSAgent extends Agent
 {
+	private static int simulateNum = 100;
 	private Random rn;
 	
 	public MCTSAgent(Player player)
@@ -18,15 +19,18 @@ public class MCTSAgent extends Agent
 				player.getGameHistory(), player.index, player.getIsStartGame(), player.getPassCount(), 
 				player.getNumRemainPlayer(), player.getPlayerNumCards(), player.getIsRevoBeforeRound());		
 		
-		SimulatedGame sg = new SimulatedGame(gs);
+		double sum = 0;
+		long startTime = System.currentTimeMillis();
+		for(int i = 0; i < simulateNum; i++)
+		{
+			SimulatedGame sg = new SimulatedGame(gs);
+			int[] result = sg.startSimulate();
+			sum += (double)result[player.index];
+		}
+		long stopTime = System.currentTimeMillis();
+		long elapsedTime = stopTime - startTime;
+		System.out.println("time: " + (double)elapsedTime * 0.001 + ", result: " + sum / simulateNum);
 		
-		int[] result = sg.startSimulate();
-		
-		for(int i = 0; i < result.length; i++)
-			System.out.println(result[i] + " ");
-		
-		System.out.println();
-		System.out.println("=================================================");
 		
 		// the following just temp for gen new random movement 
 		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame());

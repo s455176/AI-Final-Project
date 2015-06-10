@@ -7,6 +7,7 @@ public class SimulatedGame
 	
 	public SimulatedGame(GameState gamestate)
 	{
+		// construct by copying the game state
 		gs = new GameState(gamestate);
 		rn = new Random();
 	}
@@ -118,9 +119,13 @@ public class SimulatedGame
 	
 	public int[] startSimulate()
 	{
-		int[] result = new int[]{-1, -1, -1, -1};
+		int[] result = new int[]{4, 4, 4, 4};
 		int place = 1;
 		int remain = gs.remainPlayer;
+		
+		for(int i = 0; i < Constant.numPlayer; i++)
+			if(gs.numCards[i] == 0)
+				result[i] = 0;
 		
 		while(gs.remainPlayer > 1)
 		{
@@ -134,7 +139,7 @@ public class SimulatedGame
 			// check whether a player finish
 			if(remain > gs.remainPlayer)
 				for(int i = 0; i < Constant.numPlayer; i++)
-					if(gs.numCards[i] == 0 && result[i] == -1)
+					if(gs.numCards[i] == 0 && result[i] == 4)
 					{
 						result[i] = place;
 						place++;

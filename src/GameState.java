@@ -87,17 +87,29 @@ public class GameState
 	public boolean doMove(int playerIndex, Movement move)
 	{	
 		// not the player_playerIndex's turn
+		System.out.println(move);
 		if(playerIndex != next)
+		{
+			SystemFunc.throwException("GameState doMove: not the player_playerIndex's turn, playerIndex: " + 
+					playerIndex + ", next is " + next);
 			return false;
+		}
 		
 		// check is the shown card is shown again (if move is pass, numCard == 0)
 		for(int i = 0; i < move.numCards; i++)
 			if(history[move.cards[i].getIndex()])
+			{
+				SystemFunc.throwException("GameState doMove: Card has been shown before, player " + playerIndex +
+						", card: " + new Card(move.cards[i].getIndex()));
 				return false;
+			}
 		
 		// check is the move legal against the last move
 		if(!Rule.isLegalMove(move, showMove, isRevo, isStartGame))
+		{
+			SystemFunc.throwException("GameState doMove: Move not legal, player " + playerIndex);
 			return false;
+		}
 		
 		// the move is legal move do the move (if move is pass, numCard == 0)  
 		for(int i = 0; i < move.numCards; i++)
@@ -177,11 +189,15 @@ public class GameState
 	
 	public String toString()
 	{
-		String s = "=========================================\n";
+		String s = "=================" + index + "========================\n";
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
 			s += "player " + i + ": " + numCards[i] + ", ";
 		}
+		s += "\n";
+		for(int i = 0; i < Constant.numMaxHandCard; i++)
+			if(playerHand[i] != null)
+				s += playerHand[i].toString() + " ";
 		s += "\n";
 		if(showMove != null)
 			s += "showMove: " + showMove.toString();
@@ -191,7 +207,17 @@ public class GameState
 		s += "++++++++++++++++++++++++++++++++++++++++++++";
 		return s;
 	}
-	
+
+	public boolean isInPlayerHand(int index)
+	{
+		for(int i = 0; i < Constant.numMaxHandCard; i++)
+		{
+			if(playerHand[i] == null) continue;
+			else if(playerHand[i].getIndex() == index)
+				return true;
+		}
+		return false;
+	}
 	
 	private void resetNewRoundRevo()
 	{

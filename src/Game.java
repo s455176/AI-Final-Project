@@ -21,7 +21,9 @@ public class Game extends JPanel implements ActionListener
 	private Movement showMove;
 	private boolean isGameEnd, isRoundEnd, isStartGame;
 	public boolean[] isPlayerPassed;
-	private boolean isRevo, is11Revo;
+	private boolean isRevo, is11Revo, isRevoBeforeRound;
+	private boolean[] history;
+	private int passCount;
 	
 	// test GameState 
 //	public GameState gs;
@@ -65,13 +67,20 @@ public class Game extends JPanel implements ActionListener
 		{
 			choose[i] = false;
 		}
+		history = new boolean[Constant.MAX_NUM_CARD];
+		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
+		{
+			history[i] = false;
+		}
 		player0Fin = false;
 		showMove = null;
 		isGameEnd = false;
 		isRoundEnd = false;
+		isRevoBeforeRound = false;
 		isStartGame = true;
 		isRevo = false;
 		is11Revo = false;
+		passCount = 0;
 		timer = new Timer(10, this);
 		timer.start();
 		
@@ -102,13 +111,19 @@ public class Game extends JPanel implements ActionListener
 		{
 			choose[i] = false;
 		}
+		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
+		{
+			history[i] = false;
+		}
 		player0Fin = false;
 		removeShowCards();
 		isGameEnd = false;
 		isStartGame = true;
+		isRevoBeforeRound = false;
 		isRoundEnd = false;
 		isRevo = false;
 		is11Revo = false;
+		passCount = 0;
 		deck.shuffle();
 
                 Arrays.fill(playedCards, 0);
@@ -121,7 +136,10 @@ public class Game extends JPanel implements ActionListener
 		hasWinner = false;
 	}
 	
-	
+	public boolean getIsRevoBeforeRound()
+	{
+		return isRevoBeforeRound;
+	}
 	public boolean getIsRevo()
 	{
 		return isRevo;
@@ -131,7 +149,28 @@ public class Game extends JPanel implements ActionListener
 	{
 		return isStartGame;
 	}
-	
+	public boolean getIs11Revo()
+	{
+		return is11Revo;
+	}
+	public int getPassCount()
+	{
+		return passCount;
+	}
+	public boolean[] getHistory()
+	{
+		boolean[] value = new boolean[Constant.MAX_NUM_CARD];
+		System.arraycopy(history, 0, value, 0, history.length);
+		return value;
+	}
+	public int[] getPlayerNumCards()
+	{
+		int[] value = new int[Constant.numPlayer];
+		for(int i = 0; i < Constant.numPlayer; i++)
+			value[i] = players[i].numHandCards;
+		
+		return value;
+	}
 	/**
 	 * deal the cards to 4 players, and also need to draw the cards on the JPanel
 	 */
@@ -328,6 +367,12 @@ public class Game extends JPanel implements ActionListener
 			}
 			// draw the cards show in the middle
 			drawShowCards(move);
+			for(int i = 0; i < move.numCards; i++)
+			{
+				if(history[move.cards[i].getIndex()])
+					SystemFunc.throwException("card has shown before in Game doMove, Big trouble");
+				history[move.cards[i].getIndex()] = true;
+			}
 			if(move.is4CardsRevo)
 			{
 				System.out.println("4 cards Revo");
@@ -493,7 +538,7 @@ public class Game extends JPanel implements ActionListener
 	public void run()
 	{
 		int turn = deal();
-		boolean isRevoBeforeRound = false;
+		isRevoBeforeRound = false;
 		
 		// test GameState
 //		gs = new GameState(players[0].hand, showMove, isRevo, is11Revo, turn, GameState.initHistory(), 0, true, 0, 
@@ -547,7 +592,7 @@ public class Game extends JPanel implements ActionListener
 			isPlayerPassed[i] = false;
 		}
 	}
-	private int numRemainPlayer()
+	public int numRemainPlayer()
 	{
 		int count = 0;
 		for(int i = 0; i < Constant.numPlayer; i++)
@@ -583,7 +628,7 @@ public class Game extends JPanel implements ActionListener
 	public int runRound(int initTurn)
 	{
 		// init the round
-		int passCount = 0;
+		passCount = 0;
 		int turn = initTurn; /*note that the player who is the first player in the round is not allowed to pass*/
 		int nextRoundStart = -1;
 		isRoundEnd = false;
@@ -676,7 +721,7 @@ public class Game extends JPanel implements ActionListener
 			int key = e.getKeyCode();
 			if(key == KeyEvent.VK_ENTER && !isEnter)
 			{
-				players[0].genLegalMove(showMove);
+				Player.genLegalMove(showMove, players[0].hand, isRevo, isStartGame);
 				isEnter = true;
 				player0Fin = playerPressedEnter(0);
 			}

@@ -4,12 +4,10 @@ import java.util.*;
 public class TestAgent extends Agent
 {
 	private Random rn;
-	private int start;
 	
 	public TestAgent(Player player)
 	{
 		this.player = player;
-		start = 0;
 		rn = new Random();
 	}
 	/**
@@ -33,7 +31,7 @@ public class TestAgent extends Agent
 //		}
 //		start = nextStart;
 //		return new Movement(c);
-		LinkedList<Movement> ll = player.genLegalMove(player.getGameShowMove());
+		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame());
 		int numElement = ll.size();
 		int index = rn.nextInt(numElement);
 		System.out.println(numElement + " " + index);

@@ -17,6 +17,9 @@ public class Movement
 	{
 		if(cards.length < 0 || cards.length > Constant.maxMovementCard)
 		{
+			for(int i = 0; i < cards.length; i++)
+				System.out.print(cards[i] + " ");
+			System.out.println();
 			has11Revo = false;
 			is4CardsRevo = false;
 			has8Cut = false;

@@ -241,20 +241,17 @@ public class Rule implements Constant
         Card[] sortedNewCards = new Card[cards.length];
         
         //Brute force search for best replace card.
-        for (int bestType = 7; bestType >= 1; --bestType)
+        for (int i = 52; i >= 1; --i)
         {
-            for (int i = 52; i >= 1; --i)
-            {
-                newCards[pos] = new Card(valueToIndexMap[i]);
-                System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
-                Arrays.sort(sortedNewCards);
-                int type = combination(sortedNewCards);
-                if (type == bestType){
-                	// System.out.println(type);
-                    return new Card(valueToIndexMap[i]);
-                }
+            newCards[pos] = new Card(valueToIndexMap[i]);
+            System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
+            Arrays.sort(sortedNewCards);
+            int type = combination(sortedNewCards);
+            if (type != Constant.ILLEGAL){
+            	// System.out.println(type);
+                return new Card(valueToIndexMap[i]);
             }
-        }        
+        }
         // Program should not get to this point.
         System.out.println("Can't find a replace card for joker.");
         return new Card(0);

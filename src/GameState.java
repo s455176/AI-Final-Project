@@ -44,7 +44,7 @@ public class GameState
 		}
 		
 		// clone the showMove
-		if(showMove == null)
+		if(show == null)
 			showMove = null;
 		else
 		{
@@ -241,7 +241,124 @@ public class GameState
 			}
 			i = (i + 1) % Constant.numPlayer;
 		}
+//		if(nextStartTurn == -1)
+//		{
+//			for(int j = 0; j < Constant.numPlayer; j++)
+//			{
+//				System.out.print(numCards[j] + " ");
+//			}
+//			SystemFunc.throwException("\ngame should be finish, error in find next player in GameState");
+//		}
 		return nextStartTurn;
+	}
+	
+	
+	public LinkedList<Movement> genMove(int playerIndex)
+	{
+		if(playerIndex == this.index)
+		{
+			LinkedList<Movement> ll = Player.genLegalMove(this.showMove, this.playerHand, this.isRevo, this.isStartGame);
+			return ll;
+		}
+		else
+		{
+			LinkedList<Movement> ll = genOppoMove(numCards[playerIndex]);
+			return ll;
+		}		
+	}
+	
+	public LinkedList<Movement> genOppoMove(int limit)
+	{
+		boolean[] history = this.history;
+		Movement showMove = this.showMove;
+		boolean hasJoker = false;
+		int count = 0;
+		
+		if(!history[0] && !this.isInPlayerHand(0))
+			hasJoker = true;
+		
+		for(int i = 1; i < Constant.MAX_NUM_CARD; i++)
+			if(!history[i] && !this.isInPlayerHand(i))
+				count++;
+		
+		Card[] shrinkHand = new Card[count];
+		
+		int index = 0;
+		for(int i = 1; i < Constant.MAX_NUM_CARD; i++)
+			if(!history[i] && !this.isInPlayerHand(i))
+				shrinkHand[index++] = new Card(i);
+
+		LinkedList<Movement> ll = new LinkedList<Movement>();
+		boolean genAll = (showMove == null);
+		
+		if(genAll)
+		{
+			if(hasJoker)
+				for(int i = 3; i <= Math.min(limit, 5); i++)
+					Player.findStraightWithJoker(ll, shrinkHand, i, new Card(0), null, this.isRevo, this.isStartGame);
+			for(int i = 3; i <= Math.min(limit, 5); i++)
+				Player.findStraightWithoutJoker(ll, shrinkHand, i, null, this.isRevo, this.isStartGame);
+
+			if(hasJoker)
+				for(int i = 2; i <= Math.min(limit, 4); i++)
+					Player.findContinuousWithJoker(ll, shrinkHand, i, new Card(0), null, this.isRevo, this.isStartGame);
+			for(int i = 2; i <= Math.min(limit, 4); i++)
+				Player.findContinuousWithoutJoker(ll, shrinkHand, i, null, this.isRevo, this.isStartGame);
+			
+			if(limit >= 1)
+			{
+				if(hasJoker)
+					Player.findAllSingle(ll, shrinkHand, true, new Card(0), null, this.isRevo, this.isStartGame);
+				else
+					Player.findAllSingle(ll, shrinkHand, false, null, null, this.isRevo, this.isStartGame);
+			}
+		}
+		else
+		{
+			int type = showMove.type;
+			switch(type)
+			{
+				case Constant.SINGLE:
+					if(limit >= type)
+					{
+						if(hasJoker)
+							Player.findAllSingle(ll, shrinkHand, true, new Card(0), showMove, this.isRevo, this.isStartGame);
+						else
+							Player.findAllSingle(ll, shrinkHand, false, null, showMove, this.isRevo, this.isStartGame);
+					}
+					break;
+					
+				case Constant.PAIR:
+				case Constant.TRIPLE:
+				case Constant.FOUR:
+					if(limit >= type)
+					{
+						if(hasJoker)
+							Player.findContinuousWithJoker(ll, shrinkHand, type, new Card(0), showMove, this.isRevo, this.isStartGame);
+						Player.findContinuousWithoutJoker(ll, shrinkHand, type, showMove, this.isRevo, this.isStartGame);
+					}
+					break;
+					
+				case Constant.STRAIGHT3:
+				case Constant.STRAIGHT4:
+				case Constant.STRAIGHT5:
+					if(limit >= type - 2)
+					{
+						if(hasJoker)
+							Player.findStraightWithJoker(ll, shrinkHand, type - Constant.PAIR, new Card(0), showMove, this.isRevo, this.isStartGame);
+						Player.findStraightWithoutJoker(ll, shrinkHand, type - Constant.PAIR, showMove, this.isRevo, this.isStartGame);
+					}
+					break;
+				
+				default:
+					SystemFunc.throwException("Error occurs in player genLegalMove cause showMove has wrong type");
+			}
+			// genPass
+			Card[] c = new Card[0];
+			ll.add(new Movement(c));
+		}
+		
+		return ll;
 	}
 }
 

@@ -539,7 +539,8 @@ public class Game extends JPanel implements ActionListener
 	{
 		int turn = deal();
 		isRevoBeforeRound = false;
-		
+		printAllPlayerCards();
+
 		// test GameState
 //		gs = new GameState(players[0].hand, showMove, isRevo, is11Revo, turn, GameState.initHistory(), 0, true, 0, 
 //				Constant.numPlayer, new int[]{players[0].numHandCards, players[1].numHandCards, players[2].numHandCards, players[3].numHandCards}, 
@@ -606,7 +607,10 @@ public class Game extends JPanel implements ActionListener
 	
 	public Movement getShowMove()
 	{
-		return showMove;
+		if(showMove == null)
+			return null;
+		
+		return new Movement(showMove.getCards());
 	}
 	
 	private int findNextPlayerWithHandCards(int cur)
@@ -623,6 +627,20 @@ public class Game extends JPanel implements ActionListener
 			i = (i + 1) % Constant.numPlayer;
 		}
 		return nextStartTurn;
+	}
+
+	public void printAllPlayerCards()
+	{
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			System.out.println("player " + i + ": ");
+			for(int j = 0; j < Constant.numMaxHandCard; j++)
+			{
+				if(players[i].hand[j] == null) continue;
+				System.out.print(players[i].hand[j] + " ");
+			}
+			System.out.println();
+		}
 	}
 	
 	public int runRound(int initTurn)

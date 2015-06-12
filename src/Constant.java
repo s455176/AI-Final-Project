@@ -54,4 +54,7 @@ public interface Constant
 	static final int PASS      = 8;
 
         static boolean RECORDING = true;
+        
+        static final int cardPoit = 13;
+        
 }

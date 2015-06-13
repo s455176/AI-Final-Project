@@ -3,6 +3,7 @@ import java.util.Arrays;
 
 public class HeuristicAgent extends Agent
 {
+        private Player player;
 	public HeuristicAgent(Player player)
 	{
 		this.player = player;
@@ -33,10 +34,15 @@ public class HeuristicAgent extends Agent
                                 player.getIsStartGame()
                                 );
 
+                // Only choice is pass.
+                if (ll.size() == 1) {
+                        return new Movement(new Card[0]);
+                }
+
                 boolean[] history = player.getGameHistory();
 
                 // Compute the score for each move, choose the best.
-                int bestScore = -1;
+                double bestScore = -1;
                 int bestIndex = -1;
                 for (int i = 0; i < ll.size(); ++i) {
                         Movement move = (Movement)ll.get(i);
@@ -48,14 +54,15 @@ public class HeuristicAgent extends Agent
                         Card[] left = playCard(hand, move, tempHistory);
                         //Card[] successor = new Card[hand.length - numPlay];
                         
-                        int score = computeValue(left, tempHistory);
+                        double score = computeValue(left, tempHistory);
                         if (score > bestScore) {
                                 bestScore = score;
                                 bestIndex = i;
                         }
                 }
+                return (Movement)ll.get(bestIndex);
 
-                return new Movement(null);
+                //return new Movement(null);
 	}
         public Card[] playCard(Card[] cards, Movement move, boolean[] history)
         {
@@ -75,8 +82,10 @@ public class HeuristicAgent extends Agent
                 return left;
         }
 
-        public int computeValue(Card[] left, boolean[] his)
+        public double computeValue(Card[] left, boolean[] his)
         {
+                // How many rank still has chance to be played
+                // as Revolution.
                 List cardList = Arrays.asList(left);
                 int numRevable = 0;
                 for (int i = 1; i < 14; ++i) {
@@ -90,16 +99,35 @@ public class HeuristicAgent extends Agent
                                 numRevable += 1;
                         }
                 }
-                int totalPlayed = 53 - left.length;
+
+                // How many card left in players' hands.
+                int totalHand = 53 - left.length;
                 for (int i = 0; i < 53; ++i) {
-                        if (his[i]) totalPlayed -= 1;
+                        if (his[i]) totalHand -= 1;
                 }
                 
+                int avarge = (int)(totalHand/3.0) + 1;
+
+                // 11 left unplayed.
+                int num11 = 0;
+                for (int i = 11; i < 53; i+= 13) {
+                        if (!his[i]) num11 += 1;
+                }
+
+                double chance4 = 0.1 * numRevable;
+                double chance11 = 0.2 * num11;
+
+                int[] normalWeight = new int[] {14, 12, 13, 1, 2, 3, 4, 5, 6, 7, 15, 9, 10, 11};
+                int[] oppositeWeight = new int[] {14, 2, 1, 13, 12, 11, 10, 9, 8, 7, 15, 5, 4, 3};
+
+                double weight = 0.0;
+                for (Card c : left) {
+                        weight += normalWeight[c.getRank()] * 1.0;
+                        weight += oppositeWeight[c.getRank()] * (chance4 + chance11);
+                }
 
 
-
-
-                return -1;
+                return weight;
         }
 
         public static void main(String[] args)

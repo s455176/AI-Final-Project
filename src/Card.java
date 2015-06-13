@@ -105,7 +105,7 @@ public class Card extends JLabel implements Comparable<Card>
 	}
 	
 	// B01902018
-	public ArrayList<Movement> getCombination(int startIndex, ArrayList<Card> cardsIndex, int cardCombination)
+	public static ArrayList<Movement> getCombination(int startIndex, ArrayList<Integer> cardsIndex, int cardCombination)
 	{
 		ArrayList<Movement> moves = new ArrayList<Movement>();
 		int temp;

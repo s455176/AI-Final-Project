@@ -25,7 +25,7 @@ public class MiniMaxAgent extends Agent
 	{
 		// get PlayerGameState
 		// call maxOfMiniMax(PlayerGameState, layer = 0)
-		maxOfMiniMax(player.game.gameState, 0);
+		maxOfMiniMax(player.getGame().gameState, 0);
 		
 		// return random(possibleMoves)
 		int length = possibleMoves.size();
@@ -45,16 +45,22 @@ public class MiniMaxAgent extends Agent
 		// get possible moves: cards, pass
 		//Movement[] moves = currentPlayerGameState.getSuccessor();
 		//ArrayList<Movement> moves = currentPlayerGameState.getSuccessor();
-		ArrayList<int> handCardIndex;
+		ArrayList<Integer> handCardIndex;
 		for (Card card : this.player.hand)
 			handCardIndex.add(card.index);
+		ArrayList<Movement> moves = new ArrayList<Movement>();
 		for (int cardIndex : handCardIndex)
-			ArrayList<Movement> moves = Card.getCombination(cardIndex, handCardIndex, currentPlayerGameState.getCardCombination());
+		{
+			int cardCombination = currentPlayerGameState.getCardCombination();
+			ArrayList<Movement> combinations = Card.getCombination(cardIndex, handCardIndex, cardCombination);
+			for (Movement combination : combinations)
+				moves.add(combination);
+		}
 		
 		// for each moves
 		//     call minOfMiniMax(getPlayerGameState(currentPlayerGameState, move), layer)
 		//     record value in list
-		ArrayList<int> values = new ArrayList<int>();
+		ArrayList<Integer> values = new ArrayList<Integer>();
 		for (Movement move : moves)
 		{
 			int value = minOfMiniMax(currentPlayerGameState.getPlayerGameState(move), layer);
@@ -74,8 +80,11 @@ public class MiniMaxAgent extends Agent
 		{
 			int length = values.size();
 			for (int i = 0; i < length; i++)
+			{
+				int value = values.get(i);
 				if (value == maximum)
 					possibleMoves.add(moves.get(i));
+			}
 		}
 		
 		// return max
@@ -106,13 +115,13 @@ public class MiniMaxAgent extends Agent
 				cards[card.index] = 0;*/
 		boolean[] cards = currentPlayerGameState.getCards();
 		
-		ArrayList<int> cardsLeft = new ArrayList<int>();
+		ArrayList<Integer> cardsLeft = new ArrayList<Integer>();
 		for (int i = 0; i < 53; i++)
-			if (cards[i] == 1)
+			if (cards[i] == true)
 				cardsLeft.add(i);
 		
 		// combination of possible cards from other players
-		ArrayList<Movement[]> combinations = new ArrayList<Movement[]>();
+		ArrayList<Movement> combinations = new ArrayList<Movement>();
 		int cardCombination = currentPlayerGameState.getCardCombination();
 		for (int cardIndex : cardsLeft)
 		{
@@ -139,28 +148,28 @@ public class MiniMaxAgent extends Agent
 				tempPlayerGameState = tempPlayerGameState.getPlayerGameState(new Movement());
 			}
 			else
-				for (int j = i + 1; j < combination.size(); j++)
+				for (int j = i + 1; j < combinations.size(); j++)
 				{
 					if (j < 0)
 						tempPlayerGameState = tempPlayerGameState.getPlayerGameState(new Movement());
 					else
 					{
-						if (tempPlayerGameState.isLegalMove(combination.get(j)))
-							tempPlayerGameState = tempPlayerGameState.getPlayerGameState(combination.get(j));
+						if (tempPlayerGameState.isLegalMove(combinations.get(j)))
+							tempPlayerGameState = tempPlayerGameState.getPlayerGameState(combinations.get(j));
 						else
 							continue;
 					}
 					if (tempPlayerGameState.isFinalState())
 						tempPlayerGameState = tempPlayerGameState.getPlayerGameState(new Movement());
 					else
-						for (int k = j + 1; k < combination.size(); k++)
+						for (int k = j + 1; k < combinations.size(); k++)
 						{
 							if (k < 0)
 								tempPlayerGameState = tempPlayerGameState.getPlayerGameState(new Movement());
 							else
-								if (tempPlayerGameState.isLegalMove(combination.get(k)))
+								if (tempPlayerGameState.isLegalMove(combinations.get(k)))
 								{
-									tempPlayerGameState = tempPlayerGameState.getPlayerGameState(combination.get(k));
+									tempPlayerGameState = tempPlayerGameState.getPlayerGameState(combinations.get(k));
 									value = maxOfMiniMax(tempPlayerGameState, layer + 1);
 									if (value <= minValue)
 										minValue = value;

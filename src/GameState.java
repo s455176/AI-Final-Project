@@ -131,6 +131,12 @@ public class GameState
 			numCards[playerIndex]--;
 		}
 		
+		// check numCards for debugging check 
+		for(int i = 0; i < Constant.numPlayer; i++)
+			if(numCards[i] < 0 || numCards[i] > Constant.numMaxHandCard)
+				SystemFunc.throwException("Invalid num of Cards for player " + i + " with " + numCards[i] + " cards "
+						+ " thrown in GameState doMove");
+		
 		// continue the game flow
 		if(move.type == Constant.PASS)
 		{

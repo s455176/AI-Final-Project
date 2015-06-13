@@ -40,9 +40,13 @@ public class MCTSAgent extends Agent
 //		System.out.println(numElement + " " + index);
 //		return ll.get(index);
 		
-//		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame()); 
-//		int numElement = ll.size();
-//		
+		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame()); 
+		int numElement = ll.size();
+		
+		// if only one move left, then just return the move
+		if(numElement == 1)
+			return ll.get(0);
+
 //		double[] score = new double[numElement];
 		
 		GameState gs = new GameState(player.hand, player.getGameShowMove(), player.getIsRevo(), player.getIs11Revo(), player.index,
@@ -67,6 +71,7 @@ public class MCTSAgent extends Agent
 		
 		double best_score = root.children[0].score[player.index] / root.children[0].count;
 		int best_child = 0;
+		System.out.println(root.children[0].move + " " + best_score);
 		for(int i = 1; i < root.children.length; i++)
 		{
 			double s = root.children[i].score[player.index] / root.children[i].count;
@@ -88,8 +93,6 @@ public class MCTSAgent extends Agent
 		{
 			// EXPANSION
 			int numMove = startNode.expand();
-			
-			System.out.println(numMove);
 			
 			// no legal move
 			if(numMove <= 0) return ;
@@ -177,6 +180,8 @@ public class MCTSAgent extends Agent
 					// System.out.println(childGs);
 					children[i] = new Node(ll.get(i), childGs);
 				}
+//				System.out.println(ll.size() + " " + gs.showMove);
+//				System.out.println(ll);
 				return ll.size();
 			}
 		}

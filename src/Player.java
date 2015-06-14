@@ -23,6 +23,13 @@ public class Player
 		this.game = game;
 		agent = new MCTSAgent(this);
 	}
+	
+	// B01902018
+	public Game getGame()
+	{
+		return this.game;
+	}
+	
 	/** 
 	 * reset the player' s attribute
 	 */

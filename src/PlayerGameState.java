@@ -14,7 +14,7 @@ public class PlayerGameState
 	{
 		history = new ArrayList<Movement>();
         // ERROR: Undefined NEWROUND
-		//cardCombination = NEWROUND;
+		cardCombination = Constant.NEWROUND;
 		cardCombination = 0;
 		cards = new boolean[53];
 		for (int i = 0; i < 53; i++)

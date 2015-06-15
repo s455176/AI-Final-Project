@@ -6,6 +6,13 @@ public class SimulatedGame
 	private Random rn;
 	private Card[][] opponentHand;
 	
+	public SimulatedGame()
+	{
+		gs = null;
+		rn = null;
+		opponentHand = null;
+	}
+	
 	public SimulatedGame(GameState gamestate)
 	{
 		// construct by copying the game state

@@ -2,9 +2,9 @@ import java.util.LinkedList;
 
 public class AlphaBetaAgent extends MMTSAgent
 {
-	public AlphaBetaAgent(Player player)
+	public AlphaBetaAgent(Player player, int depth)
 	{
-		super(player);
+		super(player, depth);
 	}
 	
 	public double runMaxNode(Node n, int depth, double alpha, double beta)

@@ -15,13 +15,30 @@ public class Player
 	 * @param game the game which player is playing 
 	 * @param index the index of the player in the game
 	 */
-	public Player(Game game, int index) throws IOException
+	public Player(Game game, int index, int agentType, int[] agentAttr) throws IOException
 	{
 		this.index = index;
 		hand = new Card[Constant.numMaxHandCard];
 		reset();
 		this.game = game;
-		agent = new TestAgent(this);
+		
+		switch(agentType)
+		{
+			case Constant.RandomAgent:
+				agent = new TestAgent(this);
+				break;
+			case Constant.MCTSAgent:
+				agent = new MCTSAgent(this, agentAttr[0], agentAttr[1]);
+				break;
+			case Constant.MMTSomAgent:
+				agent = new MMTSAgent(this, agentAttr[0]);
+				break;
+			case Constant.AlphaBetaAgent:
+				agent = new AlphaBetaAgent(this, agentAttr[0]);
+				break;
+			default:
+				SystemFunc.throwException("no such agent type");
+		}
 	}
 	
 	// B01902018
@@ -560,7 +577,7 @@ public class Player
 	public static void main(String[] args) throws IOException
 	{
 		Game g = new Game();
-		Player p = new Player(g, 0);
+		Player p = new Player(g, 0, Constant.RandomAgent, new int[]{});
 		Card[] spades = new Card[13];
         Card[] hearts = new Card[13];
         Card[] diams  = new Card[13];

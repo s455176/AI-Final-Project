@@ -3,11 +3,12 @@ import java.util.LinkedList;
 
 public class MMTSAgent extends Agent
 {
-	public static int NUM_DEPTH = 3;
+	public int NUM_DEPTH = 3;
 	
-	public MMTSAgent(Player player)
+	public MMTSAgent(Player player, int depth)
 	{
 		this.player = player;
+		this.NUM_DEPTH = depth;
 	}
 	
 	@Override

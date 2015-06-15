@@ -14,6 +14,7 @@ public class HeuristicAgent extends Agent implements Constant
 	
 	public Movement decideMove()
 	{
+                System.out.println("Enter Heuristic Agent.");
 	        GameState gs = new GameState(player.hand, player.getGameShowMove(),
                                 player.getIsRevo(), player.getIs11Revo(), player.index,
                                 player.getGameHistory(), player.index,
@@ -30,11 +31,13 @@ public class HeuristicAgent extends Agent implements Constant
                 Card[] handWithNull = player.hand;
                 Card[] hand = new Card[numCards];
                 // Remove null in hand.
+                int index = 0;
                 for (int i = 0; i < handWithNull.length; ++i) {
-                        if (handWithNull == null) continue;
-                        hand[i] = handWithNull[i];
+                        if (handWithNull[i] == null) continue;
+                        hand[index] = handWithNull[i];
+                        index += 1;
                 }
-                // All the possible move.
+                // All the legal move.
                 LinkedList legalMoves = player.genLegalMove(player.getGameShowMove(),
                                 player.hand, player.getIsRevo(),
                                 player.getIsStartGame()
@@ -42,18 +45,26 @@ public class HeuristicAgent extends Agent implements Constant
 
                 // Only choice is pass.
                 if (legalMoves.size() == 1) {
+                        Movement move = (Movement)legalMoves.get(0);
+                        //if (move.type != Constant.PASS) {
+                        //        SystemFunc.throwException("getLegamMove didin't generate pass");
+                        //}
                         return (Movement)legalMoves.get(0);
                 }
 
-                //boolean[] history = player.getGameHistory();
+                //LinkedList<MoveScore> legalScores = computeListScore(legalMoves, isRevo || is11Revo, canRevo);
+                //Collections.sort(legalScores);
 
                 // TODO: find combo for all type.
-                LinkedList allMoves = player.genLegalMove(
-                                new Movement(new Card[0]),
+                LinkedList allMoves = player.genLegalMove( // new Movement(new Card[0]),
+                                null,
                                 player.hand, player.getIsRevo(),
                                 player.getIsStartGame()
                                 );
                 ListIterator iter = allMoves.listIterator();
+
+                System.out.println("Start computing Linked list.");
+                //ListIterator iter = legalMoves.listIterator();
 
                 LinkedList<Movement> singlell = new LinkedList<Movement>();
                 LinkedList<Movement> doublell = new LinkedList<Movement>();
@@ -87,15 +98,48 @@ public class HeuristicAgent extends Agent implements Constant
                                 otherll.add(m);
                         }
                 }
+                System.out.println("Start computing list scores.");
 
                 // Compute value in each linked list.
-                LinkedList singleScore = computeListScore(singlell, canRevo);
-                LinkedList doubleScore = computeListScore(doublell, canRevo);
-                LinkedList fourScore   = computeListScore(fourll, canRevo);
-                LinkedList otherScore  = computeListScore(otherll, canRevo);
+                LinkedList<MoveScore> singleScore = computeListScore(singlell, isRevo || is11Revo, canRevo);
+                LinkedList<MoveScore> doubleScore = computeListScore(doublell, isRevo || is11Revo, canRevo);
+                LinkedList<MoveScore> fourScore   = computeListScore(fourll,   isRevo || is11Revo, canRevo);
+                LinkedList<MoveScore> otherScore  = computeListScore(otherll,  isRevo || is11Revo, canRevo);
 
-                
+                Collections.sort(singleScore);
+                Collections.sort(doubleScore);
+                Collections.sort(fourScore);
+                Collections.sort(otherScore);
+                System.out.println("Sorting list score complete.");
 
+                LinkedList<MoveScore> legalScores = computeListScore(legalMoves, isRevo || is11Revo, canRevo);
+                Collections.sort(legalScores);
+
+                ListIterator scoreIter = legalScores.listIterator();
+                while (scoreIter.hasNext()) {
+                        MoveScore ms = (MoveScore)scoreIter.next();
+                        System.out.println(ms.toString());
+                        switch (ms.move.type) {
+                                case(Constant.SINGLE):
+                                case(Constant.PAIR):
+                                case(Constant.FOUR):
+                                default:
+                        }
+                }
+
+              
+
+                // Play other first.
+                /*
+                if (otherScore.size() != 0) {
+                        if (!legalMoves.contains( otherScore.get(0).move )) {
+                                SystemFunc.throwException("otherScore return move is not legal.");
+                        }
+                        return otherScore.get(0).move;
+                }
+                */
+
+                /*
 
                 // TODO: if other are all pass.
                 if (player.getNumRemainPlayer() - 1 == player.getPassCount()) {
@@ -110,6 +154,7 @@ public class HeuristicAgent extends Agent implements Constant
                         }
                         System.out.println("dont play other, single, double...");
                 }
+                */
 
                 // TODO: temporary return.
                 return (Movement)legalMoves.get(0);
@@ -163,49 +208,63 @@ public class HeuristicAgent extends Agent implements Constant
         {
                 public double bigScore;
                 public double smallScore;
+                public double totalScore;
                 public Movement move;
-                public boolean isRevo;
+                public boolean Revo;
 
-                public MoveScore(Movement move, double big, double small, boolean isRevo) 
+                public MoveScore(Movement move, double big, double small, boolean Revo) 
                 {
                         this.move = move;
                         this.bigScore = big;
                         this.smallScore = small;
-                        this.isRevo = isRevo;
+                        this.totalScore = small + big;
+                        this.Revo = Revo;
                 }
                 public void setRevo(boolean b)
                 {
-                        isRevo = b;
+                        Revo = b;
                 }
                 @Override
                 public int compareTo(MoveScore other) {
-                        if (isRevo) {
-                                return (this.smallScore > other.smallScore) ? 1 : 0;
+                        if (this.move.type > other.move.type) {
+                                return 1;
                         }
-                        else {
-                                return (this.bigScore > other.bigScore) ? 1 : 0;
-                        }
+                        return (this.totalScore > other.totalScore) ? 1 : 0;
                 }
+                @Override
+                public String toString() {
+                        String s = "Move: " + handToString(move.cards) + "\n";
+                        s += "bigScore: " + Double.toString(bigScore);
+                        s += ", smallScore: " + Double.toString(smallScore) + "\n";
+                        return s;
+                }
+
 
         }
         
-        public LinkedList computeListScore(LinkedList ll, boolean canRevo)
+        public LinkedList<MoveScore> computeListScore(LinkedList ll, boolean Revo, boolean canRevo)
         {
                 LinkedList<MoveScore> scoreList = new LinkedList<MoveScore>();
                 ListIterator iter = ll.listIterator();
                 while (iter.hasNext()) {
                         Movement move = (Movement)iter.next();
-                        MoveScore score = computeValue(move, canRevo);
+                        if (move.type == Constant.PASS)
+                                continue;
+                        MoveScore score = computeValue(move, Revo, canRevo);
                         //scoreList.add( new MoveScore(move, canRevo) );
                         scoreList.add( score );
                 }
                return scoreList; 
         }
 
-        public MoveScore computeValue(Movement move, boolean canRevo)
+        public MoveScore computeValue(Movement move, boolean isRevoNow, boolean canRevo)
         {
-                double bigWeight = (isRevo) ? 0.1 : 1.0;
-                double smallWeight = (isRevo) ? 1.0 : 0.1;
+                double bigWeight = (isRevoNow) ? 0.1 : 1.0;
+                double smallWeight = (isRevoNow) ? 1.0 : 0.1;
+
+                if (canRevo) {
+                        smallWeight += 2.0;
+                }
 
                 // How many rank still has chance to be played
                 // as Revolution.
@@ -240,7 +299,7 @@ public class HeuristicAgent extends Agent implements Constant
                 int[] numRankLeft = new int[13];
                 for (int i = 1; i < 53; ++i) {
                         if (!history[i]) {
-                                numRankLeft[i%14 - 1] += 1;
+                                numRankLeft[(i-1)%13] += 1;
                         }
                 }
 
@@ -251,35 +310,32 @@ public class HeuristicAgent extends Agent implements Constant
                 double bigScore = (52 - stronger) * bigWeight;
                 double smallScore = (52 - weaker) * smallWeight;
 
-                return new MoveScore(move, bigScore, smallScore, isRevo);
+                return new MoveScore(move, bigScore, smallScore, isRevoNow);
         }
-        public int numStronger(Movement move, int[] numRankLeft)
+        public static int numStronger(Movement move, int[] numRankLeft)
         {
                 Card[] cards = move.cards;
                 Arrays.sort(cards);
+                //printHand(cards);
                 int type = move.type;
                 if (type == STRAIGHT3) type = 3;
                 if (type == STRAIGHT4) type = 4;
                 if (type == STRAIGHT5) type = 5;
-                int rank = cards[-1].getRank();
+                int rank = cards[cards.length-1].getRank();
+                // Joker or 2.
                 if ((rank ==  0) || (rank == 2)) return 0;
                 int stronger = 0;
-                for (int i = 0; i < 2; ++i) {
-                        if (rank > 2) break;
-                        if (numRankLeft[i] >= type && rank > i + 1) {
-                                stronger += numRankLeft[i] / type;
-                        }
-                }
-                for (int i = 2; i < 13; ++ i) {
-                        if (rank < 3) break;
-                        if (rank < (i + 1)) break;
-                        if (numRankLeft[i] >= type) {
-                                stronger += numRankLeft[i] / type;
-                        }
+
+                rank = (rank < 3) ? rank + 13 : rank;
+
+                for (int i = 0; i < 13; ++i) {
+                        int j = (i+1 < 3) ? i+1 + 13 : i+1;
+                        if (rank >= j) continue;
+                        stronger += numRankLeft[i] / type;
                 }
                 return stronger;
         }
-        public int numWeaker(Movement move, int[] numRankLeft)
+        public static int numWeaker(Movement move, int[] numRankLeft)
         {
                 Card[] cards = move.cards;
                 Arrays.sort(cards);
@@ -290,18 +346,12 @@ public class HeuristicAgent extends Agent implements Constant
                 int rank = cards[0].getRank();
                 if ((rank ==  0) || (rank == 3)) return 0;
                 int weaker = 0;
-                for (int i = 0; i < 2; ++i) {
-                        if (rank > 2) break;
-                        if (rank > i+1 && numRankLeft[i] >= type) {
-                                weaker += numRankLeft[i] / type;
-                        }
-                }
-                for (int i = 2; i < 13; ++ i) {
-                        if (rank < 3) break;
-                        if (rank < i + 1) break;
-                        if (numRankLeft[i] >= type) {
-                                weaker += numRankLeft[i] / type;
-                        }
+                rank = (rank < 3) ? rank + 13 : rank;
+
+                for (int i = 0; i < 13; ++i) {
+                        int j = (i+1 < 3) ? i+1 + 13 : i+1;
+                        if (rank <= j) continue;
+                        weaker += numRankLeft[i] / type;
                 }
                 return weaker;
         }
@@ -335,6 +385,26 @@ public class HeuristicAgent extends Agent implements Constant
                 }
                 printHistory(history);
 
+                // History in rank form.
+                int[] numRankLeft = new int[13];
+                for (i = 1; i < 53; ++i) {
+                        if (!history[i]) {
+                                numRankLeft[(i-1)%13] += 1;
+                        }
+                }
+                for (i = 0; i < 13; ++i) {
+                        System.out.print(Integer.toString(numRankLeft[i]));
+                }
+                System.out.println("");
+
+                //Card[] testCards = new Card[1];
+                Movement test1 = new Movement(new Card[] {new Card(7)});
+
+                System.out.println("7 stronger: " + numStronger(test1, numRankLeft));
+                System.out.println("7 smaller: " + numWeaker(test1, numRankLeft));
+
+
+
         }
         public boolean allPlayed(int rank, boolean[] his) 
         {
@@ -349,6 +419,16 @@ public class HeuristicAgent extends Agent implements Constant
                         System.out.print(cards[i].toString() + " ");
                 }
                 System.out.println("");
+        }
+        public static String handToString(Card[] cards) 
+        {
+                String s = "";
+                for (int i = 0; i < cards.length; ++i) {
+                        s += cards[i].toString() + " ";
+                        //System.out.print(cards[i].toString() + " ");
+                }
+                //System.out.println("");
+                return s;
         }
         public static void printHistory(boolean[] his) 
         {

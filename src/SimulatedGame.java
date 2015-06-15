@@ -3,13 +3,13 @@ import java.util.*;
 public class SimulatedGame
 {
 	private GameState gs;
-	private Random rn;
+	// private Random rn;
 	private Card[][] opponentHand;
 	
 	public SimulatedGame()
 	{
 		gs = null;
-		rn = null;
+		// rn = null;
 		opponentHand = null;
 	}
 	
@@ -17,7 +17,7 @@ public class SimulatedGame
 	{
 		// construct by copying the game state
 		gs = new GameState(gamestate);
-		rn = new Random();
+		// rn = new Random();
 		opponentHand = new Card[Constant.numPlayer][];
 		Deck d = new Deck();
 		d.shuffle();
@@ -40,7 +40,7 @@ public class SimulatedGame
 	{
 		LinkedList<Movement> ll = Player.genLegalMove(gs.showMove, opponentHand[gs.next], gs.isRevo, gs.isStartGame);
 		int numElement = ll.size();
-		int chooseIndex = rn.nextInt(numElement);
+		int chooseIndex = Constant.rn.nextInt(numElement);
 		Movement move = ll.get(chooseIndex); 
 		
 		for(int i = 0; i < move.numCards; i++)
@@ -65,7 +65,7 @@ public class SimulatedGame
 	{
 		LinkedList<Movement> ll = Player.genLegalMove(gs.showMove, gs.playerHand, gs.isRevo, gs.isStartGame);
 		int numElement = ll.size();
-		int chooseIndex = rn.nextInt(numElement);
+		int chooseIndex = Constant.rn.nextInt(numElement);
 		
 		return ll.get(chooseIndex);
 	}

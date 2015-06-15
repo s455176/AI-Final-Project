@@ -25,7 +25,7 @@ public class Game extends JPanel implements ActionListener
 	private boolean isRevo, is11Revo, isRevoBeforeRound;
 	private boolean[] history;
 	private int passCount;
-	private Random rn;
+	// private Random rn;
 	
 	// for record simulation data only used in runSimulation and runRoundSimulation
 	public int place;
@@ -56,7 +56,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public Game() throws IOException
 	{
-		rn = new Random();
+		// rn = new Random();
 		gui = new GUIResource(this);
 		setFocusable(true);
 		setLayout(null);
@@ -206,7 +206,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public int deal()
 	{
-		int turn = rn.nextInt(Constant.numPlayer);
+		int turn = Constant.rn.nextInt(Constant.numPlayer);
 		int startingPlayer = -1;
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{

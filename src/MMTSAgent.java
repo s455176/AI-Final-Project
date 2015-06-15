@@ -89,6 +89,12 @@ public class MMTSAgent extends Agent
 		{
 			Movement m = ll.get(i);
 			int type = m.type;
+			
+			// skip movement that is a single joker
+			Card[] c = m.getCards();
+			if(c.length == 1 && c[0].isJoker())
+				continue;
+			
 			switch(type)
 			{
 			case Constant.SINGLE:

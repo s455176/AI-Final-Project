@@ -1,6 +1,9 @@
+import java.util.Random;
 
 public interface Constant
 {
+	static Random rn = new Random();
+	
 	static final int MAX_NUM_CARD = 53;
 
 	static final int DIAMOND = 2;

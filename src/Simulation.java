@@ -21,7 +21,7 @@ public class Simulation extends JFrame
 	
 	public static void main(String[] args) throws IOException
 	{
-		int iteration = 20;
+		int iteration = 30;
 		int[][] playerStatStatic = new int[Constant.numPlayer][iteration];
 		long[] playerTimeStatic = new long[Constant.numPlayer];
 		int[] playerMoveCountStatic = new int[Constant.numPlayer];
@@ -35,6 +35,7 @@ public class Simulation extends JFrame
 		
 		for(int iter = 0; iter < iteration; iter++)
 		{
+			System.out.println("===========================Iter: " + iter + "===========================");
 			Simulation simulation = new Simulation();
 			simulation.game.runInSimulation();
 			for(int i = 0; i < Constant.numPlayer; i++)
@@ -51,7 +52,7 @@ public class Simulation extends JFrame
 		}
 		
 		// result
-		int[][] result = new int[4][4];
+		int[][] result = new int[Constant.numPlayer][4]; // player, status
 		for(int i = 0; i < 4; i++)
 			for(int j = 0; j < 4; j++)
 				result[i][j] = 0;
@@ -60,17 +61,19 @@ public class Simulation extends JFrame
 		{
 			for(int j = 0;j < Constant.numPlayer; j++)
 			{
-				System.out.println("player " + i + ": " + playerStatStatic[i][j]);
-				result[j][playerStatStatic[i][j]]++;
+				System.out.print("player " + j + ": " + playerStatStatic[j][i] + " ");
+				result[j][playerStatStatic[j][i] - 1]++;
 			}
+			System.out.println();
 		}
 		System.out.println("-----result-----");
 		System.out.println("ID\t 1st\t 2nd\t 3rd\t 4th\t");
 		for(int i = 0; i < 4; i++)
 		{
+			System.out.print("player " + i + ":\t");
 			for(int j = 0; j < 4; j++)
 			{
-				System.out.print("player " + i + ":\t" + result[i][j]);
+				System.out.print(result[i][j] + "\t");
 			}
 			System.out.println();
 		}

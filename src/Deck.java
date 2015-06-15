@@ -5,7 +5,7 @@ public class Deck
 {
 	// attribute
 	private Card[] cards  = new Card[Constant.MAX_NUM_CARD];
-	private Random rn = new Random();
+	// private Random rn = new Random();
 	private int position;
 	
 	// method
@@ -30,11 +30,11 @@ public class Deck
 	}
 	public void shuffle()
 	{
-		rn.setSeed(System.currentTimeMillis());
+		Constant.rn.setSeed(System.currentTimeMillis());
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{
 			Card hold = cards[i];
-			int shuf = rn.nextInt(Constant.MAX_NUM_CARD);
+			int shuf = Constant.rn.nextInt(Constant.MAX_NUM_CARD);
 			cards[i] = cards[shuf];
 			cards[shuf] = hold;
 		}

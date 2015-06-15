@@ -3,12 +3,12 @@ import java.util.*;
 
 public class TestAgent extends Agent
 {
-	private Random rn;
+	// private Random rn;
 	
 	public TestAgent(Player player)
 	{
 		this.player = player;
-		rn = new Random();
+		// rn = new Random();
 	}
 	/**
 	 * Return a Movement decided by the agent base on the current situation
@@ -33,7 +33,7 @@ public class TestAgent extends Agent
 //		return new Movement(c);
 		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame());
 		int numElement = ll.size();
-		int index = rn.nextInt(numElement);
+		int index = Constant.rn.nextInt(numElement);
 		System.out.println(numElement + " " + index);
 		return ll.get(index);
 	}

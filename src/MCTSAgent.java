@@ -6,12 +6,12 @@ public class MCTSAgent extends Agent
 {
 	private int simulateNum = 20;
 	private int iteration = 10;
-	private Random rn;
+	// private Random rn;
 	
 	public MCTSAgent(Player player, int sumulateNum, int iteration)
 	{
 		this.player = player;
-		rn = new Random();
+		// rn = new Random();
 		this.simulateNum = sumulateNum;
 		this.iteration = iteration;
 	}

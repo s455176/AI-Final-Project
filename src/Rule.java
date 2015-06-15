@@ -32,7 +32,7 @@ public class Rule implements Constant
      * @param cards a Card array.
      * @return int type, see Constant.java.
      */
-    public static int combination(Card[] cards)
+    public static int combination(Card[] cards, boolean isRevo)
     {
         int length = cards.length;
 
@@ -58,7 +58,7 @@ public class Rule implements Constant
             if (rank == 0) 
             {
                 // It's joker, replace it with best choice card.
-                cards[i] = replaceJoker(cards, i);
+                cards[i] = replaceJoker(cards, i, isRevo);
                 rank = cards[i].getRank();
             }
             values[i] = (rank < 3) ? rank + 13 : rank;
@@ -217,8 +217,9 @@ public class Rule implements Constant
             int value = cards[i].getRank();
             if (value == 0)
             {
-                cards[i] = replaceJoker(cards, i);
-                value = cards[i].getRank();
+            	SystemFunc.throwException("cards should not contain joker when passed into toggleVlaue");
+//                cards[i] = replaceJoker(cards, i);
+//                value = cards[i].getRank();
             }
             intArray[i] = (value < 3) ? value + 13 : value;
         }
@@ -234,23 +235,40 @@ public class Rule implements Constant
      * @return a new card array which joker has been replaced by 
      *         another card.
      */
-    public static Card replaceJoker(Card[] cards, int pos)
+    public static Card replaceJoker(Card[] cards, int pos, boolean isRevo)
     {
         Card[] newCards = new Card[cards.length];
         System.arraycopy(cards, 0, newCards, 0, cards.length);
         Card[] sortedNewCards = new Card[cards.length];
         
         //Brute force search for best replace card.
-        for (int i = 52; i >= 1; --i)
+        if(!isRevo)
         {
-            newCards[pos] = new Card(valueToIndexMap[i]);
-            System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
-            Arrays.sort(sortedNewCards);
-            int type = combination(sortedNewCards);
-            if (type != Constant.ILLEGAL){
-            	// System.out.println(type);
-                return new Card(valueToIndexMap[i]);
-            }
+	        for (int i = 52; i >= 1; --i)
+	        {
+	            newCards[pos] = new Card(valueToIndexMap[i]);
+	            System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
+	            Arrays.sort(sortedNewCards);
+	            int type = combination(sortedNewCards, isRevo);
+	            if (type != Constant.ILLEGAL){
+	            	// System.out.println(type);
+	                return new Card(valueToIndexMap[i]);
+	            }
+	        }
+        }
+        else
+        {
+        	for (int i = 1; i <= 52; ++i)
+	        {
+	            newCards[pos] = new Card(valueToIndexMap[i]);
+	            System.arraycopy(newCards, 0, sortedNewCards, 0, newCards.length);
+	            Arrays.sort(sortedNewCards);
+	            int type = combination(sortedNewCards, isRevo);
+	            if (type != Constant.ILLEGAL){
+	            	// System.out.println(type);
+	                return new Card(valueToIndexMap[i]);
+	            }
+	        }
         }
         // Program should not get to this point.
         System.out.println("Can't find a replace card for joker.");
@@ -279,7 +297,7 @@ public class Rule implements Constant
         Card[] two1   = new Card[] {spades[3], joker};
         Card[] triple = new Card[] {spades[1], joker, clubs[1]};
         Card[] four   = new Card[] {spades[2], hearts[2], joker, diams[2]};
-        Card[] straight34567 = new Card[] {spades[2], joker, spades[4], spades[5], spades[6]};
+        Card[] straight5678J = new Card[] {spades[7], joker, spades[4], spades[5], spades[6]};
         Card[] straight12345 = new Card[] {spades[0], spades[1], spades[2], spades[3], spades[4]};
         Card[] straightJQK12 = new Card[] {spades[10], spades[11], spades[12], spades[0], spades[1]};
         
@@ -287,19 +305,19 @@ public class Rule implements Constant
         Card[] singleJoker = new Card[] {joker};
 
         System.out.println("Combination test: ");
-        System.out.println("Test double: " + combination(two1));
-        System.out.println("Test triple: " + combination(triple));
-        System.out.println("Test four  : " + combination(four));
-        System.out.println("Test 34567 : " + combination(straight34567));
-        System.out.println("Test 12345 : " + combination(straight12345));
-        System.out.println("Test JQK12 : " + combination(straightJQK12));
-        System.out.println("Test Pass  : " + combination(new Card[0]));
-        System.out.println("Test straightjoker: " + combination(straightjoker));
-        System.out.println("Test singleJoker: " + combination(singleJoker));
+        System.out.println("Test double: " + combination(two1, false));
+        System.out.println("Test triple: " + combination(triple, true));
+        System.out.println("Test four  : " + combination(four, true));
+        System.out.println("Test 34567 : " + combination(straight5678J, true));
+        System.out.println("Test 12345 : " + combination(straight12345, false));
+        System.out.println("Test JQK12 : " + combination(straightJQK12, false));
+        System.out.println("Test Pass  : " + combination(new Card[0], false));
+        System.out.println("Test straightjoker: " + combination(straightjoker, false));
+        System.out.println("Test singleJoker: " + combination(singleJoker, true));
 
-        Movement m1 = new Movement(straight34567);
-        Movement m2 = new Movement(singleJoker);
-        System.out.println(m1);
+        Movement m1 = new Movement(straight5678J, true);
+        Movement m2 = new Movement(singleJoker, true);
+        System.out.println(m1 + " " + m1.biggestValue);
         System.out.println(m2);
         
         System.out.println("\nisLegal play test:");
@@ -309,16 +327,16 @@ public class Rule implements Constant
         Card[] four4   = new Card[] {spades[3], hearts[3], clubs[3]};
         Card[] straight45678 = new Card[] {spades[3], spades[4], spades[5], spades[6], spades[7]};
         
-        Movement singleMove = new Movement(new Card[] {spades[0]});
-        Movement two1Move = new Movement(two1);
-        Movement two2Move = new Movement(two2);
-        Movement triple2Move = new Movement(triple);
-        Movement triple3Move = new Movement(triple3);
-        Movement four3Move = new Movement(four);
-        Movement four4Move = new Movement(four4);
-        Movement s34567Move = new Movement(straight34567);
-        Movement s45678Move = new Movement(straight45678);
-        Movement s12345Move = new Movement(straight12345);
+        Movement singleMove = new Movement(new Card[] {spades[0]}, false);
+        Movement two1Move = new Movement(two1, false);
+        Movement two2Move = new Movement(two2, false);
+        Movement triple2Move = new Movement(triple, false);
+        Movement triple3Move = new Movement(triple3, false);
+        Movement four3Move = new Movement(four, false);
+        Movement four4Move = new Movement(four4, false);
+        Movement s34567Move = new Movement(straight5678J, false);
+        Movement s45678Move = new Movement(straight45678, false);
+        Movement s12345Move = new Movement(straight12345, false);
 
         System.out.println("Play 1     against 22     : " + isLegalMove(singleMove, two2Move, false, false));
         System.out.println("Play 11    against 22     : " + isLegalMove(two1Move, two2Move, false, false));

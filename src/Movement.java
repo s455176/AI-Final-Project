@@ -13,7 +13,7 @@ public class Movement
 	 * 
 	 * @param cards the cards which will be formed as a combination 
 	 */
-	public Movement(Card[] cards)
+	public Movement(Card[] cards, boolean isRevo)
 	{
 		if(cards.length < 0 || cards.length > Constant.maxMovementCard)
 		{
@@ -49,13 +49,32 @@ public class Movement
 			is4CardsRevo = (this.numCards >= 4);
 			Arrays.sort(this.cards, 0, this.numCards);
 			Card[] tempCards = getCards();
-			this.type = Rule.combination(tempCards);
+			this.type = Rule.combination(tempCards, isRevo);
 			if(type != Constant.PASS)
 			{
 				int[] tempValue = Rule.toggleValue(tempCards);
 				this.biggestValue = tempValue[tempValue.length - 1];
 			}
 		}
+	}
+	
+	public Movement(Movement m)
+	{
+		if(m == null)
+			SystemFunc.throwException("copy a null movement in movement constructor");
+		
+		this.cards = m.getCards();
+		this.numCards = cards.length;
+		this.type = m.type;
+		this.biggestValue = m.biggestValue;
+		this.has8Cut = m.has8Cut;
+		this.has11Revo = m.has11Revo;
+		this.is4CardsRevo = m.is4CardsRevo;
+	}
+	
+	public Movement(Card[] cards)
+	{
+		this(cards, false);
 	}
 	
 	// B01902018

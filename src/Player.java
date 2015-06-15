@@ -6,7 +6,7 @@ public class Player
 	public Card[] hand;
 	public int numHandCards;
 	private Game game;
-	private AlphaBetaAgent agent;
+	private Agent agent;
 	public int index;
 	
 	/**
@@ -21,7 +21,7 @@ public class Player
 		hand = new Card[Constant.numMaxHandCard];
 		reset();
 		this.game = game;
-		agent = new AlphaBetaAgent(this);
+		agent = new TestAgent(this);
 	}
 	
 	// B01902018
@@ -215,7 +215,7 @@ public class Player
 			}
 			// genPass
 			Card[] c = new Card[0];
-			ll.add(new Movement(c));
+			ll.add(new Movement(c, isRevo));
 		}
 			
 		// System.out.println(ll);
@@ -284,7 +284,7 @@ public class Player
 				}
 				if(k - j == length)
 				{
-					Movement m = new Movement(c);
+					Movement m = new Movement(c, isRevo);
 					if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 						ll.add(m);
 				}
@@ -322,7 +322,7 @@ public class Player
 								Card[] c = new Card[2];
 								c[0] = shrinkHand[allCards[i * 4 + j]];
 								c[1] = shrinkHand[allCards[i * 4 + k]];
-								Movement m = new Movement(c);
+								Movement m = new Movement(c, isRevo);
 								if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 									ll.add(m);
 							}
@@ -347,7 +347,7 @@ public class Player
 						}
 						if(count == 3)
 						{
-							Movement m = new Movement(c);
+							Movement m = new Movement(c, isRevo);
 							if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 								ll.add(m);
 						}
@@ -360,7 +360,7 @@ public class Player
 					{
 						c[j] = shrinkHand[allCards[i * 4 + j]];
 					}
-					Movement m = new Movement(c);
+					Movement m = new Movement(c, isRevo);
 					if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 						ll.add(m);
 				}
@@ -374,7 +374,7 @@ public class Player
 		{
 			Card[] c = new Card[1];
 			c[0] = shrinkHand[i];
-			Movement m = new Movement(c);
+			Movement m = new Movement(c, isRevo);
 			if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 				ll.add(m);
 		}
@@ -382,7 +382,7 @@ public class Player
 		{
 			Card[] c = new Card[1];
 			c[0] = joker;
-			Movement m = new Movement(c);
+			Movement m = new Movement(c, isRevo);
 			if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 				ll.add(m);
 		}
@@ -429,7 +429,7 @@ public class Player
 					}
 					if(k - j == length)
 					{
-						Movement m = new Movement(c);
+						Movement m = new Movement(c, isRevo);
 						if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 							ll.add(m);
 						// System.out.println(m);
@@ -465,7 +465,7 @@ public class Player
 				if(k - j == newLength)
 				{
 					c[newLength] = joker;
-					Movement m = new Movement(c);
+					Movement m = new Movement(c, isRevo);
 					if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 						ll.add(m);
 					// System.out.println(m);
@@ -505,7 +505,7 @@ public class Player
 							Card[] c = new Card[2];
 							c[0] = shrinkHand[allCards[i * 4 + j]];
 							c[1] = joker;
-							Movement m = new Movement(c);
+							Movement m = new Movement(c, isRevo);
 							if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 								ll.add(m);
 						}
@@ -521,7 +521,7 @@ public class Player
 								c[0] = shrinkHand[allCards[i * 4 + j]];
 								c[1] = shrinkHand[allCards[i * 4 + k]];
 								c[2] = joker;
-								Movement m = new Movement(c);
+								Movement m = new Movement(c, isRevo);
 								if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 									ll.add(m);
 							}
@@ -546,7 +546,7 @@ public class Player
 						if(count == 3)
 						{
 							c[count] = joker;
-							Movement m = new Movement(c);
+							Movement m = new Movement(c, isRevo);
 							if(Rule.isLegalMove(m, showMove, isRevo, isStartGame))
 								ll.add(m);
 						}
@@ -596,9 +596,9 @@ public class Player
 		
 		System.out.println("=== genALL ===");
 		Player.genLegalMove(null, p.hand, p.game.getIsRevo(), false);
-		Movement showMove = new Movement(showCard);
+		Movement showMove = new Movement(showCard, p.game.getIsRevo());
 		System.out.println("=== against " + showMove + " type: " + showMove.type + ", rank: " + showMove.biggestValue);
-		Player.genLegalMove(new Movement(showCard), p.hand, p.game.getIsRevo(), false);
+		Player.genLegalMove(new Movement(showCard, p.game.getIsRevo()), p.hand, p.game.getIsRevo(), false);
 		
 		System.out.println("End");
 	}

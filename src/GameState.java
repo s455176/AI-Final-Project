@@ -47,12 +47,7 @@ public class GameState
 		if(show == null)
 			showMove = null;
 		else
-		{
-			Card[] c = new Card[show.numCards];
-			for(int i = 0; i < show.numCards; i++)
-				c[i] = new Card(show.cards[i].getIndex());
-			showMove = new Movement(c);
-		}
+			showMove = new Movement(show);
 		
 		// copy the value of the primitive type variable
 		isRevo = revo;
@@ -361,7 +356,7 @@ public class GameState
 			}
 			// genPass
 			Card[] c = new Card[0];
-			ll.add(new Movement(c));
+			ll.add(new Movement(c, this.isRevo));
 		}
 		
 		return ll;

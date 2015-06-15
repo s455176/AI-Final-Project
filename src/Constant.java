@@ -53,7 +53,7 @@ public interface Constant
         static final int STRAIGHT5 = 7;
 	static final int PASS      = 8;
 
-        static boolean RECORDING = false;
+        static boolean RECORDING = true;
         
         static final int cardPoit = 13;
         

@@ -261,7 +261,7 @@ public class Game extends JPanel implements ActionListener
 					chosenCard[j++] = players[player].hand[i];
 				}
 			}
-			Movement move = new Movement(chosenCard);
+			Movement move = new Movement(chosenCard, isRevo);
 			// cannot do the illegal move
 			if(!Rule.isLegalMove(move, showMove, getIsRevo(), isStartGame))
 			{
@@ -293,7 +293,7 @@ public class Game extends JPanel implements ActionListener
 		if(player == 0)
 		{
 			Card[] pass = new Card[0];
-			Movement passMovement = new Movement(pass);
+			Movement passMovement = new Movement(pass, isRevo);
 			// cannot do the illegal move
 			if(!Rule.isLegalMove(passMovement, showMove, getIsRevo(), isStartGame))
 			{
@@ -610,7 +610,7 @@ public class Game extends JPanel implements ActionListener
 		if(showMove == null)
 			return null;
 		
-		return new Movement(showMove.getCards());
+		return new Movement(showMove);
 	}
 	
 	private int findNextPlayerWithHandCards(int cur)

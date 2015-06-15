@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Game extends JPanel implements ActionListener
 {
@@ -24,6 +25,13 @@ public class Game extends JPanel implements ActionListener
 	private boolean isRevo, is11Revo, isRevoBeforeRound;
 	private boolean[] history;
 	private int passCount;
+	private Random rn;
+	
+	// for record simulation data only used in runSimulation and runRoundSimulation
+	public int place;
+	public int[] playerStat;
+	public long[] totalTime;
+	public int[] moveCount;
 	
 	// test GameState 
 //	public GameState gs;
@@ -48,6 +56,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public Game() throws IOException
 	{
+		rn = new Random();
 		gui = new GUIResource(this);
 		setFocusable(true);
 		setLayout(null);
@@ -58,9 +67,19 @@ public class Game extends JPanel implements ActionListener
 		deck = new Deck();
 		for(int i = 0; i < Constant.numPlayer; i++)
 		{
-			players[i] = new Player(this, i);
+//			players[i] = new Player(this, i);
 			isPlayerPassed[i] = false;
 		}
+		// initialize different agent
+		players[0] = new Player(this, 0, Constant.MCTSAgent, new int[]{20, 50});
+//		players[1] = new Player(this, 1, Constant.MCTSAgent, new int[]{40, 10});
+//		players[2] = new Player(this, 2, Constant.MCTSAgent, new int[]{30, 10});
+//		players[3] = new Player(this, 3, Constant.MCTSAgent, new int[]{20, 10});
+		
+		players[1] = new Player(this, 1, Constant.RandomAgent, new int[]{});
+		players[2] = new Player(this, 2, Constant.RandomAgent, new int[]{});
+		players[3] = new Player(this, 3, Constant.RandomAgent, new int[]{});
+		
 		choose = new boolean[Constant.numMaxHandCard];
 		numChoose = 0;
 		for(int i = 0; i < Constant.numMaxHandCard; i++)
@@ -98,6 +117,13 @@ public class Game extends JPanel implements ActionListener
 			playerMoves.add(new ArrayList<String>());
 		}
 		hasWinner = false;
+		place = 1;
+		playerStat = new int[Constant.numPlayer];
+		Arrays.fill(playerStat, 4);
+		totalTime = new long[Constant.numPlayer];
+		moveCount = new int[Constant.numPlayer];
+		Arrays.fill(totalTime, 0);
+		Arrays.fill(moveCount, 0);
 	}
 	public void reset()
 	{
@@ -134,6 +160,10 @@ public class Game extends JPanel implements ActionListener
 			playerMoves.add(new ArrayList<String>());
 		}
 		hasWinner = false;
+		place = 1;
+		Arrays.fill(playerStat, 4);
+		Arrays.fill(totalTime, 0);
+		Arrays.fill(moveCount, 0);
 	}
 	
 	public boolean getIsRevoBeforeRound()
@@ -176,7 +206,7 @@ public class Game extends JPanel implements ActionListener
 	 */
 	public int deal()
 	{
-		int turn = 0;
+		int turn = rn.nextInt(Constant.numPlayer);
 		int startingPlayer = -1;
 		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
 		{
@@ -535,6 +565,49 @@ public class Game extends JPanel implements ActionListener
 	/**
 	 * start playing the game begin from the player whose index is "turn"
 	 */
+	public void runInSimulation()
+	{
+		int turn = deal();
+		isRevoBeforeRound = false;
+		printAllPlayerCards();
+
+		// test GameState
+//		gs = new GameState(players[0].hand, showMove, isRevo, is11Revo, turn, GameState.initHistory(), 0, true, 0, 
+//				Constant.numPlayer, new int[]{players[0].numHandCards, players[1].numHandCards, players[2].numHandCards, players[3].numHandCards}, 
+//				false);
+		
+		while(!isGameEnd)
+		{
+			isRevoBeforeRound = isRevo;
+			turn = runRoundInSimulation(turn);
+			System.out.println("========Round end");
+			// remove the show cards in the middle
+			removeShowCards();
+			// if 11 Revo happen in this round then need reset the isRevo
+			if(is11Revo)
+			{
+				isRevo = isRevoBeforeRound;
+				is11Revo = false;
+			}
+			drawRevo();
+			// repaint();
+			SystemFunc.sleep(2000);
+			if(numRemainPlayer() == 1)
+			{
+				isGameEnd = true;
+				break;
+			}
+			if(turn == -1)
+			{
+				SystemFunc.throwException("Error: turn == -1");
+			}
+		}
+		System.out.println("========Game end");
+	}
+	
+	/**
+	 * start playing the game begin from the player whose index is "turn"
+	 */
 	public void run()
 	{
 		int turn = deal();
@@ -709,6 +782,72 @@ public class Game extends JPanel implements ActionListener
 		}
 		return nextRoundStart;
 	}
+	
+	public int runRoundInSimulation(int initTurn)
+	{
+		// init the round
+		passCount = 0;
+		int turn = initTurn; /*note that the player who is the first player in the round is not allowed to pass*/
+		int nextRoundStart = -1;
+		isRoundEnd = false;
+		int turn11Record = -1;
+		
+		// start the round 
+		while(!isRoundEnd)
+		{
+			if(players[turn].isFinish())
+			{
+				turn = (turn + 1) % Constant.numPlayer;
+				continue;
+			}
+			
+			// all other players pass
+			if(passCount == numRemainPlayer() - 1)
+			{
+				isRoundEnd = true;
+				nextRoundStart = turn;
+				break;
+			}
+			// player decide a movement
+			System.out.println("turn " + turn + ", isGameStart: " + isStartGame + ", is11Revo: " + is11Revo + 
+					", isRevo: " + isRevo);
+			
+			long startTime = System.currentTimeMillis();
+			players[turn].takeTurn();
+			long stopTime = System.currentTimeMillis();
+			long elapsedTime = stopTime - startTime;
+			totalTime[turn] += elapsedTime;
+			moveCount[turn]++;
+			
+			// after player do a moment
+			isStartGame = false;
+			if(!isPlayerPassed[turn] && players[turn].isFinish())
+			{
+				// a player has no hand cards after do a non-pass movement (ie, this player finishes)
+				isRoundEnd = true;
+				if(playerStat[turn] != 4)
+					SystemFunc.throwException("player multiple finish in runRoundSimulation");
+				playerStat[turn] = place;
+				place++;
+				nextRoundStart = findNextPlayerWithHandCards(turn);
+				break;
+			}
+			else if(!isPlayerPassed[turn] && showMove.has8Cut)
+			{
+				// a player plays a combination which is 8 cut
+				isRoundEnd = true;
+				nextRoundStart = turn;
+				break;
+			}
+			if(isPlayerPassed[turn])
+				passCount++;
+			else
+				passCount = 0;
+			turn = (turn + 1) % Constant.numPlayer;
+		}
+		return nextRoundStart;
+	}
+	
 	
 	@Override
 	public void actionPerformed(ActionEvent e)

@@ -17,10 +17,14 @@ public class GameState
 	public boolean lastRoundRevo;
 	
 	// used for a new game and assume dealing starts from player 0
-	public GameState(Card[] hand, int n, int indx)
+	public GameState(Card[] hand, int n, int indx, int p0, int p1, int p2, int p3)
 	{
-		this(hand, null, false, false, n, initHistory(), indx, true, 0, 4, new int[]{Constant.numMaxHandCard - 1, 
-			Constant.numMaxHandCard - 2, Constant.numMaxHandCard - 2, Constant.numMaxHandCard - 2}, false);
+		/*
+		 *  playerHand is input, showMove is null, isRevo and is11Revo are false, next is input n, history is initial,
+		 *  player index of the cur GameState is input indx, isGameStart is true, passCount is 0, remainPlayer is 4, 
+		 *  cardsNum in each players' hands are as following, lastRound is not Revo 
+		 */
+		this(hand, null, false, false, n, initHistory(), indx, true, 0, 4, new int[]{p0, p1, p2, p3}, false);
 	}
 	
 	public GameState(GameState gs)

@@ -4,14 +4,16 @@ import java.util.Random;
 
 public class MCTSAgent extends Agent
 {
-	private static int simulateNum = 20;
-	private static int iteration = 10;
+	private int simulateNum = 20;
+	private int iteration = 10;
 	private Random rn;
 	
-	public MCTSAgent(Player player)
+	public MCTSAgent(Player player, int sumulateNum, int iteration)
 	{
 		this.player = player;
 		rn = new Random();
+		this.simulateNum = sumulateNum;
+		this.iteration = iteration;
 	}
 	
 	public Movement decideMove()

@@ -326,6 +326,9 @@ public class Rule implements Constant
         Card[] triple3 = new Card[] {spades[2], hearts[2], clubs[2]};
         Card[] four4   = new Card[] {spades[3], hearts[3], clubs[3]};
         Card[] straight45678 = new Card[] {spades[3], spades[4], spades[5], spades[6], spades[7]};
+        Card[] J = new Card[]{joker};
+        Card[] big2 = new Card[]{spades[1]};
+        Card[] small3 = new Card[]{spades[2]};
         
         Movement singleMove = new Movement(new Card[] {spades[0]}, false);
         Movement two1Move = new Movement(two1, false);
@@ -347,6 +350,8 @@ public class Rule implements Constant
         System.out.println("Play 4444  against 333    : " + isLegalMove(four4Move, triple3Move, false, false));
         System.out.println("Play 34567 against 45678  : " + isLegalMove(s34567Move, s45678Move, false, false));
         System.out.println("Play 12345 against 45678  : " + isLegalMove(s12345Move, s45678Move, false, false));
+        System.out.println("Play Joker against 2      : " + isLegalMove(new Movement(J, false), new Movement(big2, false), false, false));
+        System.out.println("Play Joker against 3      : " + isLegalMove(new Movement(J, true), new Movement(small3, true), true, false));
         System.out.println("");
     }
 }

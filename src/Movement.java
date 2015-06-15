@@ -31,6 +31,7 @@ public class Movement
 		}
 		else
 		{
+			boolean hasJoker = false;
 			this.cards = new Card[cards.length];
 			this.numCards = cards.length;
 			for(int i = 0; i < numCards; i++)
@@ -45,6 +46,8 @@ public class Movement
 					has8Cut = true;
 				if((this.cards[i].getIndex() - 1) % 13 + 1 == 11)
 					has11Revo = true;
+				if(this.cards[i].isJoker())
+					hasJoker = true;
 			}
 			is4CardsRevo = (this.numCards >= 4);
 			Arrays.sort(this.cards, 0, this.numCards);
@@ -52,8 +55,15 @@ public class Movement
 			this.type = Rule.combination(tempCards, isRevo);
 			if(type != Constant.PASS)
 			{
-				int[] tempValue = Rule.toggleValue(tempCards);
-				this.biggestValue = tempValue[tempValue.length - 1];
+				if(hasJoker && cards.length == 1)
+				{
+					this.biggestValue = (isRevo)? -1: 16;
+				}
+				else
+				{
+					int[] tempValue = Rule.toggleValue(tempCards);
+					this.biggestValue = tempValue[tempValue.length - 1];
+				}
 			}
 		}
 	}

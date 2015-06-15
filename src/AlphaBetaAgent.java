@@ -12,6 +12,7 @@ public class AlphaBetaAgent extends MMTSAgent
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
+		// System.out.println(numMove + " " + depth);
 		// termination condition 
 		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
 			return evaluation(n);
@@ -45,6 +46,7 @@ public class AlphaBetaAgent extends MMTSAgent
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
+		// System.out.println(numMove + " " + depth);
 		// termination condition 
 		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
 			return evaluation(n);
@@ -101,7 +103,12 @@ public class AlphaBetaAgent extends MMTSAgent
 			childGs = new GameState(gs);
 			childGs.doMove(gs.next, ll.get(i));
 			childNode = new Node(ll.get(i), childGs);
-			double score = runMinNode(childNode, NUM_DEPTH, alpha, beta);
+			
+			double score;
+			if(childGs.next != player.index)
+				score = runMinNode(childNode, NUM_DEPTH, alpha, beta);
+			else
+				score = runMaxNode(childNode, NUM_DEPTH, alpha, beta);
 			
 			if(score > alpha)
 			{

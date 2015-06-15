@@ -5,7 +5,7 @@ public class Movement
 	public Card[] cards;
 	public int numCards;
 	public int type;
-	public int biggestRank;
+	public int biggestValue;
 	public boolean has8Cut, has11Revo, is4CardsRevo;
 	
 	/**
@@ -24,7 +24,7 @@ public class Movement
 			is4CardsRevo = false;
 			has8Cut = false;
 			type = Constant.ILLEGAL;
-			biggestRank = -1;
+			biggestValue = -1;
 			cards = null;
 			numCards = 0;
 			SystemFunc.throwException("Invalid Movement");
@@ -53,7 +53,7 @@ public class Movement
 			if(type != Constant.PASS)
 			{
 				int[] tempValue = Rule.toggleValue(tempCards);
-				this.biggestRank = tempValue[tempValue.length - 1];
+				this.biggestValue = tempValue[tempValue.length - 1];
 			}
 		}
 	}

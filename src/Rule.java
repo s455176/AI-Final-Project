@@ -175,8 +175,8 @@ public class Rule implements Constant
             return false;
         }
 
-        int lastBiggest = lastMove.biggestRank;
-        int playBiggest = playMove.biggestRank;
+        int lastBiggest = lastMove.biggestValue;
+        int playBiggest = playMove.biggestValue;
 
         if (lastType == playType)
         {

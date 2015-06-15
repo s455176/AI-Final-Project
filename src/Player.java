@@ -6,7 +6,7 @@ public class Player
 	public Card[] hand;
 	public int numHandCards;
 	private Game game;
-	private MCTSAgent agent;
+	private AlphaBetaAgent agent;
 	public int index;
 	
 	/**
@@ -21,7 +21,7 @@ public class Player
 		hand = new Card[Constant.numMaxHandCard];
 		reset();
 		this.game = game;
-		agent = new MCTSAgent(this);
+		agent = new AlphaBetaAgent(this);
 	}
 	
 	// B01902018
@@ -597,7 +597,7 @@ public class Player
 		System.out.println("=== genALL ===");
 		Player.genLegalMove(null, p.hand, p.game.getIsRevo(), false);
 		Movement showMove = new Movement(showCard);
-		System.out.println("=== against " + showMove + " type: " + showMove.type + ", rank: " + showMove.biggestRank);
+		System.out.println("=== against " + showMove + " type: " + showMove.type + ", rank: " + showMove.biggestValue);
 		Player.genLegalMove(new Movement(showCard), p.hand, p.game.getIsRevo(), false);
 		
 		System.out.println("End");

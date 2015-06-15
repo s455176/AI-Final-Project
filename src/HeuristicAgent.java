@@ -6,15 +6,16 @@ public class HeuristicAgent extends Agent implements Constant
         private Player player;
         private boolean[] history;
         private boolean isRevo, is11Revo;
+        private Random ran;
 
 	public HeuristicAgent(Player player)
 	{
 		this.player = player;
+                ran = new Random();
 	}
 	
 	public Movement decideMove()
 	{
-                System.out.println("Enter Heuristic Agent.");
 	        GameState gs = new GameState(player.hand, player.getGameShowMove(),
                                 player.getIsRevo(), player.getIs11Revo(), player.index,
                                 player.getGameHistory(), player.index,
@@ -49,11 +50,14 @@ public class HeuristicAgent extends Agent implements Constant
                         //if (move.type != Constant.PASS) {
                         //        SystemFunc.throwException("getLegamMove didin't generate pass");
                         //}
+                        System.out.println("only choice " + move.toString());
                         return (Movement)legalMoves.get(0);
                 }
-
-                //LinkedList<MoveScore> legalScores = computeListScore(legalMoves, isRevo || is11Revo, canRevo);
-                //Collections.sort(legalScores);
+                // Pass and last card, play the last card.
+                if (legalMoves.size() == 2) {
+                        System.out.println("someone should win now.");
+                        return (Movement)legalMoves.get(0);
+                }
 
                 // TODO: find combo for all type.
                 LinkedList allMoves = player.genLegalMove( // new Movement(new Card[0]),
@@ -63,7 +67,6 @@ public class HeuristicAgent extends Agent implements Constant
                                 );
                 ListIterator iter = allMoves.listIterator();
 
-                System.out.println("Start computing Linked list.");
                 //ListIterator iter = legalMoves.listIterator();
 
                 LinkedList<Movement> singlell = new LinkedList<Movement>();
@@ -98,7 +101,6 @@ public class HeuristicAgent extends Agent implements Constant
                                 otherll.add(m);
                         }
                 }
-                System.out.println("Start computing list scores.");
 
                 // Compute value in each linked list.
                 LinkedList<MoveScore> singleScore = computeListScore(singlell, isRevo || is11Revo, canRevo);
@@ -110,21 +112,60 @@ public class HeuristicAgent extends Agent implements Constant
                 Collections.sort(doubleScore);
                 Collections.sort(fourScore);
                 Collections.sort(otherScore);
-                System.out.println("Sorting list score complete.");
 
                 LinkedList<MoveScore> legalScores = computeListScore(legalMoves, isRevo || is11Revo, canRevo);
                 Collections.sort(legalScores);
 
                 ListIterator scoreIter = legalScores.listIterator();
-                while (scoreIter.hasNext()) {
-                        MoveScore ms = (MoveScore)scoreIter.next();
-                        System.out.println(ms.toString());
-                        switch (ms.move.type) {
-                                case(Constant.SINGLE):
-                                case(Constant.PAIR):
-                                case(Constant.FOUR):
-                                default:
+                int position, movesLeft;
+
+                MoveScore ms = (MoveScore)scoreIter.next();
+                //System.out.println(ms.toString());
+                switch (ms.move.type) {
+                        case(Constant.SINGLE):
+                                position = listIndex(singleScore, ms);
+                                movesLeft = singleScore.size();
+                                break;
+                        case(Constant.PAIR):
+                                position = listIndex(doubleScore, ms);
+                                movesLeft = doubleScore.size();
+                                break;
+                        case(Constant.FOUR):
+                                position = listIndex(fourScore, ms);
+                                movesLeft = fourScore.size();
+                                break;
+                        default:
+                                position = listIndex(otherScore,ms);
+                                movesLeft = otherScore.size();
+                }
+
+                if (Math.random() + 0.2 > (1 - (position / 1.0*movesLeft))){ 
+                        if (!legalMoves.contains(ms.move)) {
+                                SystemFunc.throwException("heuristic agent return not legal move.");
                         }
+                        System.out.println("computed choice " + ms.move.toString());
+                        return ms.move;
+                }
+                if (player.getIsStartGame()) {
+                        return ms.move;
+                }
+                System.out.println("" + player.getNumRemainPlayer() + " " + player.getPassCount());
+                if (player.getGameShowMove() == null) {
+                        return ms.move;
+                }
+                if (player.getNumRemainPlayer() - 1 == player.getPassCount()) {
+                        return ms.move;
+                }
+                if (player.getGameShowMove().type == Constant.PASS) {
+                        return ms.move;
+                }
+
+                else {
+                        System.out.println("pass");
+                        Card[] passCard = new Card[0];
+                        Movement wtf = new Movement(passCard, false);
+                        System.out.println("" + wtf.type);
+                        return new Movement(passCard, false);
                 }
 
               
@@ -157,7 +198,7 @@ public class HeuristicAgent extends Agent implements Constant
                 */
 
                 // TODO: temporary return.
-                return (Movement)legalMoves.get(0);
+                //return (Movement)legalMoves.get(0);
 
                 /*
                 // Compute the score for each move, choose the best.
@@ -186,6 +227,17 @@ public class HeuristicAgent extends Agent implements Constant
                 //return new Movement(null);
                 */
 	}
+        public int listIndex(LinkedList<MoveScore> ll, MoveScore moveScore)
+        {
+                int index = 0;
+                for (MoveScore ms : ll) {
+                        if (ms.equalsTo(moveScore)) 
+                                return index;
+                        index += 1;
+                }
+                SystemFunc.throwException("cannot find move score in ll.");
+                return -1;
+        }
         public Card[] playCard(Card[] cards, Movement move, boolean[] history)
         {
                 int numPlay = move.numCards;
@@ -238,8 +290,9 @@ public class HeuristicAgent extends Agent implements Constant
                         s += ", smallScore: " + Double.toString(smallScore) + "\n";
                         return s;
                 }
-
-
+                public boolean equalsTo(MoveScore other) {
+                        return (bigScore == other.bigScore && smallScore == other.smallScore) ? true : false;
+                }
         }
         
         public LinkedList<MoveScore> computeListScore(LinkedList ll, boolean Revo, boolean canRevo)

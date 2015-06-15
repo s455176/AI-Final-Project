@@ -36,6 +36,9 @@ public class Player
 			case Constant.AlphaBetaAgent:
 				agent = new AlphaBetaAgent(this, agentAttr[0]);
 				break;
+                        case Constant.HeuristicAgent:
+                                agent = new HeuristicAgent(this);
+                                break;
 			default:
 				SystemFunc.throwException("no such agent type");
 		}

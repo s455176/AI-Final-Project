@@ -54,10 +54,12 @@ public class HeuristicAgent extends Agent implements Constant
                         return (Movement)legalMoves.get(0);
                 }
                 // Pass and last card, play the last card.
+                /*
                 if (legalMoves.size() == 2) {
                         System.out.println("someone should win now.");
                         return (Movement)legalMoves.get(0);
                 }
+                */
 
                 // TODO: find combo for all type.
                 LinkedList allMoves = player.genLegalMove( // new Movement(new Card[0]),
@@ -139,7 +141,8 @@ public class HeuristicAgent extends Agent implements Constant
                                 movesLeft = otherScore.size();
                 }
 
-                if (Math.random() + 0.2 > (1 - (position / 1.0*movesLeft))){ 
+                System.out.println("position and leftsize " + position + " " + movesLeft);
+                if (Math.random() + 0.35 > (1 - (position / 1.0*movesLeft))){ 
                         if (!legalMoves.contains(ms.move)) {
                                 SystemFunc.throwException("heuristic agent return not legal move.");
                         }
@@ -149,11 +152,11 @@ public class HeuristicAgent extends Agent implements Constant
                 if (player.getIsStartGame()) {
                         return ms.move;
                 }
-                System.out.println("" + player.getNumRemainPlayer() + " " + player.getPassCount());
                 if (player.getGameShowMove() == null) {
                         return ms.move;
                 }
                 if (player.getNumRemainPlayer() - 1 == player.getPassCount()) {
+                        // getPass count is zero.
                         return ms.move;
                 }
                 if (player.getGameShowMove().type == Constant.PASS) {
@@ -278,7 +281,7 @@ public class HeuristicAgent extends Agent implements Constant
                 }
                 @Override
                 public int compareTo(MoveScore other) {
-                        if (this.move.type > other.move.type) {
+                        if (hasJokerOr2(this.move.cards)) {
                                 return 1;
                         }
                         return (this.totalScore > other.totalScore) ? 1 : 0;
@@ -292,6 +295,13 @@ public class HeuristicAgent extends Agent implements Constant
                 }
                 public boolean equalsTo(MoveScore other) {
                         return (bigScore == other.bigScore && smallScore == other.smallScore) ? true : false;
+                }
+                public boolean hasJokerOr2(Card[] cards) {
+                        for (Card c : cards) {
+                                if (c.getIndex() == 0) return true;
+                                if (c.getRank()  == 2) return true;
+                        }
+                        return false;
                 }
         }
         

@@ -2,7 +2,7 @@ import java.util.Random;
 
 public interface Constant
 {
-	static Random rn = new Random();
+	static Random rn = new Random(System.currentTimeMillis());
 	
 	static final int MAX_NUM_CARD = 53;
 

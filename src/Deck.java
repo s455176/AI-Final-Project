@@ -31,10 +31,14 @@ public class Deck
 	public void shuffle()
 	{
 		Constant.rn.setSeed(System.currentTimeMillis());
-		for(int i = 0; i < Constant.MAX_NUM_CARD; i++)
+		for(int i = Constant.MAX_NUM_CARD - 1; i >= 0; i--)
 		{
 			Card hold = cards[i];
-			int shuf = Constant.rn.nextInt(Constant.MAX_NUM_CARD);
+			int shuf = Constant.rn.nextInt(i + 1);
+			
+			if(shuf >= Constant.MAX_NUM_CARD)
+				SystemFunc.throwException("shuf index out of bound in deck shuffling");
+			
 			cards[i] = cards[shuf];
 			cards[shuf] = hold;
 		}

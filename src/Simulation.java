@@ -21,7 +21,7 @@ public class Simulation extends JFrame
 	
 	public static void main(String[] args) throws IOException
 	{
-		int iteration = 30;
+		int iteration = 10;
 		int[][] playerStatStatic = new int[Constant.numPlayer][iteration];
 		long[] playerTimeStatic = new long[Constant.numPlayer];
 		int[] playerMoveCountStatic = new int[Constant.numPlayer];

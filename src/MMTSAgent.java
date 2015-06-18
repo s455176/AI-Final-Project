@@ -9,6 +9,7 @@ public class MMTSAgent extends Agent
 	{
 		this.player = player;
 		this.NUM_DEPTH = depth;
+		this.type = Constant.MMTSAgent;
 	}
 	
 	@Override
@@ -28,7 +29,13 @@ public class MMTSAgent extends Agent
 		GameState childGs = new GameState(gs);
 		childGs.doMove(gs.next, ll.get(0));
 		Node childNode = new Node(ll.get(0), childGs);
-		double maxScore = runMinNode(childNode, NUM_DEPTH);
+		double maxScore;
+		
+		if(childGs.next != player.index)
+			 maxScore = runMinNode(childNode, NUM_DEPTH);
+		else
+			 maxScore = runMaxNode(childNode, NUM_DEPTH);
+		
 		int maxIndex = 0;
 		for(int i = 1; i < numElement; i++)
 		{

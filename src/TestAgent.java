@@ -8,6 +8,7 @@ public class TestAgent extends Agent
 	public TestAgent(Player player)
 	{
 		this.player = player;
+		this.type = Constant.RandomAgent;
 		// rn = new Random();
 	}
 	/**

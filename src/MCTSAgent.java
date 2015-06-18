@@ -14,6 +14,7 @@ public class MCTSAgent extends Agent
 		// rn = new Random();
 		this.simulateNum = sumulateNum;
 		this.iteration = iteration;
+		this.type = Constant.MCTSAgent;
 	}
 	
 	public Movement decideMove()

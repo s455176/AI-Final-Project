@@ -257,6 +257,10 @@ public class GameState
 		return nextStartTurn;
 	}
 	
+	public boolean isJokerShown()
+	{
+		return this.history[0];
+	}
 	
 	public LinkedList<Movement> genMove(int playerIndex)
 	{

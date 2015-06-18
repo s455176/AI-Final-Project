@@ -82,13 +82,16 @@ public class AlphaBetaAgent extends MMTSAgent
 		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame()); 
 		int numElement = ll.size();
 		
-		// if only one move left, then just return the move
-		if(numElement == 1)
-			return ll.get(0);
-		
 		GameState gs = new GameState(player.hand, player.getGameShowMove(), player.getIsRevo(), player.getIs11Revo(), player.index,
 				player.getGameHistory(), player.index, player.getIsStartGame(), player.getPassCount(), 
 				player.getNumRemainPlayer(), player.getPlayerNumCards(), player.getIsRevoBeforeRound());
+		
+		// set the record to record more data
+		record = new simulationRecordData(numElement, gs.isJokerShown());
+		
+		// if only one move left, then just return the move
+		if(numElement == 1)
+			return ll.get(0);			
 		
 		double alpha = -Double.MAX_VALUE;
 		double beta = Double.MAX_VALUE;

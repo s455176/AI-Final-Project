@@ -23,15 +23,19 @@ public class Simulation extends JFrame
 	{
 		int iteration = 10;
 		int[][] playerStatStatic = new int[Constant.numPlayer][iteration];
-		long[] playerTimeStatic = new long[Constant.numPlayer];
-		int[] playerMoveCountStatic = new int[Constant.numPlayer];
+		
+		timeMeasure[] total = new timeMeasure[Constant.numPlayer];
+		timeMeasure[] thinking = new timeMeasure[Constant.numPlayer];
 		
 		for(int i = 0; i < Constant.numPlayer; i++)
 			for(int j = 0; j < iteration; j++)
 				playerStatStatic[i][j] = 0;
 		
-		Arrays.fill(playerTimeStatic, 0);
-		Arrays.fill(playerMoveCountStatic, 0);
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			total[i] = new timeMeasure();
+			thinking[i] = new timeMeasure();
+		}
 		
 		for(int iter = 0; iter < iteration; iter++)
 		{
@@ -41,10 +45,10 @@ public class Simulation extends JFrame
 			for(int i = 0; i < Constant.numPlayer; i++)
 			{
 				playerStatStatic[i][iter] = simulation.game.playerStat[i];
-				playerTimeStatic[i] += simulation.game.totalTime[i];
-				playerMoveCountStatic[i] += simulation.game.moveCount[i];
-				System.out.println("player " + i + ": " + simulation.game.playerStat[i] + 
-						", time per move: " + 0.001 * (double)simulation.game.totalTime[i] / (double)simulation.game.moveCount[i]);
+				// total
+				total[i].update(simulation.game.total[i].getTime(), simulation.game.total[i].getCount());
+				// thinking
+				thinking[i].update(simulation.game.thinking[i].getTime(), simulation.game.thinking[i].getCount());
 			}
 			simulation.setVisible(false);
 			simulation.dispose();
@@ -80,8 +84,11 @@ public class Simulation extends JFrame
 		System.out.println("time per move:");
 		for(int i = 0; i < 4; i++)
 		{
-			System.out.println((double)playerTimeStatic[i] + " " + (double)playerMoveCountStatic[i] + " " + 
-					0.001 * (double)playerTimeStatic[i] / (double)playerMoveCountStatic[i]);
+			System.out.println("player " + i);
+			System.out.println("total: ");
+			System.out.println(total[i].getTime() + " \t" + total[i].getCount() + " \t" + total[i].mean());
+			System.out.println("thinking: ");
+			System.out.println(thinking[i].getTime() + " \t" + thinking[i].getCount() + " \t" + thinking[i].mean());
 		}
 	}
 }

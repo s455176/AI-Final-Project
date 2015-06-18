@@ -30,9 +30,9 @@ public class Game extends JPanel implements ActionListener
 	// for record simulation data only used in runSimulation and runRoundSimulation
 	public int place;
 	public int[] playerStat;
-	public long[] totalTime;
-	public int[] moveCount;
-	
+	public timeMeasure[] total;
+	public timeMeasure[] thinking;
+
 	// test GameState 
 //	public GameState gs;
 	
@@ -71,7 +71,8 @@ public class Game extends JPanel implements ActionListener
 			isPlayerPassed[i] = false;
 		}
 		// initialize different agent
-		players[0] = new Player(this, 0, Constant.MCTSAgent, new int[]{20, 50});
+		//players[0] = new Player(this, 0, Constant.AlphaBetaAgent, new int[]{5});
+		players[0] = new Player(this, 0, Constant.AlphaBetaAgent, new int[]{5});
 //		players[1] = new Player(this, 1, Constant.MCTSAgent, new int[]{40, 10});
 //		players[2] = new Player(this, 2, Constant.MCTSAgent, new int[]{30, 10});
 //		players[3] = new Player(this, 3, Constant.MCTSAgent, new int[]{20, 10});
@@ -120,10 +121,15 @@ public class Game extends JPanel implements ActionListener
 		place = 1;
 		playerStat = new int[Constant.numPlayer];
 		Arrays.fill(playerStat, 4);
-		totalTime = new long[Constant.numPlayer];
-		moveCount = new int[Constant.numPlayer];
-		Arrays.fill(totalTime, 0);
-		Arrays.fill(moveCount, 0);
+		
+		// for record time
+		total = new timeMeasure[Constant.numPlayer];
+		thinking = new timeMeasure[Constant.numPlayer];
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			total[i] = new timeMeasure();
+			thinking[i] = new timeMeasure();
+		}
 	}
 	public void reset()
 	{
@@ -162,8 +168,12 @@ public class Game extends JPanel implements ActionListener
 		hasWinner = false;
 		place = 1;
 		Arrays.fill(playerStat, 4);
-		Arrays.fill(totalTime, 0);
-		Arrays.fill(moveCount, 0);
+		
+		for(int i = 0; i < Constant.numPlayer; i++)
+		{
+			total[i] = new timeMeasure();
+			thinking[i] = new timeMeasure();
+		}
 	}
 	
 	public boolean getIsRevoBeforeRound()
@@ -813,11 +823,14 @@ public class Game extends JPanel implements ActionListener
 					", isRevo: " + isRevo);
 			
 			long startTime = System.currentTimeMillis();
-			players[turn].takeTurn();
+			simulationRecordData record = players[turn].takeTurn();
 			long stopTime = System.currentTimeMillis();
 			long elapsedTime = stopTime - startTime;
-			totalTime[turn] += elapsedTime;
-			moveCount[turn]++;
+			
+			// update the recorded time
+			total[turn].update(elapsedTime);
+			if(record.curNumLegalMove != 1)
+				thinking[turn].update(elapsedTime);
 			
 			// after player do a moment
 			isStartGame = false;
@@ -904,6 +917,43 @@ public class Game extends JPanel implements ActionListener
 	}
 }
 
+class timeMeasure
+{
+	private long time;
+	private int count;
+	
+	public timeMeasure()
+	{
+		this.time = 0;
+		this.count = 0;
+	}
+	
+	public double mean()
+	{
+		return ((double)time / (double)count) * 0.001;
+	}
+	
+	public void update(long add)
+	{
+		this.time = this.time + add;
+		this.count = this.count + 1;
+	}
+	
+	public void update(long addTime, int addCount)
+	{
+		this.time = this.time + addTime;
+		this.count = this.count + addCount;
+	}
+	
+	public long getTime()
+	{
+		return this.time;
+	}
+	public int getCount()
+	{
+		return this.count;
+	}
+}
 
 
 

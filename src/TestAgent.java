@@ -1,4 +1,3 @@
-import java.util.Random;
 import java.util.*;
 
 public class TestAgent extends Agent
@@ -34,6 +33,10 @@ public class TestAgent extends Agent
 //		return new Movement(c);
 		LinkedList<Movement> ll = Player.genLegalMove(player.getGameShowMove(), player.hand, player.getIsRevo(), player.getIsStartGame());
 		int numElement = ll.size();
+		
+		// set the record to record more data
+		record = new simulationRecordData(numElement, player.getGameHistory()[0]);
+		
 		int index = Constant.rn.nextInt(numElement);
 		System.out.println(numElement + " " + index);
 		return ll.get(index);

@@ -110,15 +110,16 @@ public class Player
 	 * second call the doMove() to pass the movement, then sleep for a while just make sure that the window will
 	 * not change too fast, so I can see clearly what' s happening
 	 * 
-	 * @return just return true
+	 * @return return num of legal move
 	 */
-	public boolean takeTurn()
+	public simulationRecordData takeTurn()
 	{
 		//System.out.println("myTurn " + index);
-		Movement move = agent.decideMove();
+		// if want record more detail data, decideMove will set the curNumLegalMove variable in agent 
+		Movement move = agent.decideMove(); 
 		doMove(move);
 		SystemFunc.sleep(1000);
-		return true;
+		return agent.record;
 	}
 	public boolean isFinish()
 	{
@@ -572,7 +573,7 @@ public class Player
 			}
 		}
 	}
-	
+
 	// unit test
 	public static void main(String[] args) throws IOException
 	{

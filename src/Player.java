@@ -30,7 +30,7 @@ public class Player
 			case Constant.MCTSAgent:
 				agent = new MCTSAgent(this, agentAttr[0], agentAttr[1]);
 				break;
-			case Constant.MMTSomAgent:
+			case Constant.MMTSAgent:
 				agent = new MMTSAgent(this, agentAttr[0]);
 				break;
 			case Constant.AlphaBetaAgent:

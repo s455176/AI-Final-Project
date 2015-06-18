@@ -5,6 +5,7 @@ public class AlphaBetaAgent extends MMTSAgent
 	public AlphaBetaAgent(Player player, int depth)
 	{
 		super(player, depth);
+		this.type = Constant.AlphaBetaAgent;
 	}
 	
 	public double runMaxNode(Node n, int depth, double alpha, double beta)
@@ -96,7 +97,11 @@ public class AlphaBetaAgent extends MMTSAgent
 		childGs.doMove(gs.next, ll.get(0));
 		Node childNode = new Node(ll.get(0), childGs);
 		
-		alpha = runMinNode(childNode, NUM_DEPTH, alpha, beta);
+		if(childGs.next != player.index)
+			alpha = runMinNode(childNode, NUM_DEPTH, alpha, beta);
+		else
+			alpha = runMaxNode(childNode, NUM_DEPTH, alpha, beta);
+
 		int bestIndex = 0;
 		for(int i = 1; i < numElement; i++)
 		{

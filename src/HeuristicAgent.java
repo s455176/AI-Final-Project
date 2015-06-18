@@ -39,7 +39,7 @@ public class HeuristicAgent extends Agent implements Constant
                         index += 1;
                 }
                 // All the legal move.
-                LinkedList legalMoves = player.genLegalMove(player.getGameShowMove(),
+                LinkedList<Movement> legalMoves = player.genLegalMove(player.getGameShowMove(),
                                 player.hand, player.getIsRevo(),
                                 player.getIsStartGame()
                                 );
@@ -53,23 +53,61 @@ public class HeuristicAgent extends Agent implements Constant
                         System.out.println("only choice " + move.toString());
                         return (Movement)legalMoves.get(0);
                 }
-                // Pass and last card, play the last card.
+
                 /*
-                if (legalMoves.size() == 2) {
-                        System.out.println("someone should win now.");
-                        return (Movement)legalMoves.get(0);
+                // Tag each card for best combination.
+                int[] cardTags = new int[numCards];
+                Arrays.fill(cardTags, 0);
+                ListIterator<Movement> tempIter = legalMoves.listIterator();
+                while (tempIter.hasNext()) {
+                        Movement move = tempIter.next();      
+                        if (move.type == Constant.PASS) continue;
+                        int type = move.type;
+                        int[] positions = findPos(hand, move.cards);
+                        for (int i = 0; i < positions.length; ++i) {
+                                System.out.println("type and pos: " + type + " " + cardTags[ positions[i] ]);
+                                if (type > cardTags[ positions[i] ]) {
+                                        cardTags[ positions[i] ] = type;
+                                }
+                        }
                 }
+                for (int i = 0; i < numCards; ++i) {
+                        System.out.print(cardTags[i] + " ");
+                }
+                System.out.println("");
                 */
 
-                // TODO: find combo for all type.
-                LinkedList allMoves = player.genLegalMove( // new Movement(new Card[0]),
+                // find combo for all type.
+                LinkedList<Movement> allMoves = player.genLegalMove( // new Movement(new Card[0]),
                                 null,
                                 player.hand, player.getIsRevo(),
                                 player.getIsStartGame()
                                 );
-                ListIterator iter = allMoves.listIterator();
 
-                //ListIterator iter = legalMoves.listIterator();
+                // Last card to play.
+                if (legalMoves.size() == 2 && allMoves.size() == 2) {
+                        return (Movement)legalMoves.get(0);
+                }
+                
+                // Tag each card for best combination.
+                int[] cardTags = new int[numCards];
+                Arrays.fill(cardTags, 0);
+                ListIterator<Movement> tempIter = allMoves.listIterator();
+                while (tempIter.hasNext()) {
+                        Movement move = (Movement)tempIter.next();      
+                        if (move.type == Constant.PASS) continue;
+                        if (hasJokerOr8(move)) continue;
+                        int type = move.type;
+                        int[] positions = findPos(hand, move.cards);
+                        for (int i = 0; i < positions.length; ++i) {
+                                //System.out.println("type and pos: " + type + " " + cardTags[ positions[i] ]);
+                                if (type > cardTags[ positions[i] ]) {
+                                        cardTags[ positions[i] ] = type;
+                                }
+                        }
+                }
+
+                ListIterator iter = allMoves.listIterator();
 
                 LinkedList<Movement> singlell = new LinkedList<Movement>();
                 LinkedList<Movement> doublell = new LinkedList<Movement>();
@@ -115,13 +153,42 @@ public class HeuristicAgent extends Agent implements Constant
                 Collections.sort(fourScore);
                 Collections.sort(otherScore);
 
+                // Socre for legal moves.
                 LinkedList<MoveScore> legalScores = computeListScore(legalMoves, isRevo || is11Revo, canRevo);
                 Collections.sort(legalScores);
 
                 ListIterator scoreIter = legalScores.listIterator();
+
+                // Too many other cards left, keep the 2, 8 and joker.
+                MoveScore ms = (MoveScore)scoreIter.next();
+                if (allMoves.size() - legalMoves.size() > 2) {
+                        System.out.println("\nhasJoker or something = " + hasJokerOr8(ms.move));
+                        while (scoreIter.hasNext() && hasJokerOr8(ms.move)) {
+                                ms = (MoveScore)scoreIter.next();
+                        }
+                }
+                // If some card in this move have better combination.
+                boolean hasBetter = true;
+                while (hasBetter) {
+                        for (Card c : ms.move.cards) {
+                                //System.out.println("better type: " + (cardTags[findIndex(hand, c)] > ms.move.type));
+                                //System.out.println("two types  : " + cardTags[findIndex(hand, c)] + " " + ms.move.type);
+                                System.out.println("-------------------------");
+                                System.out.println(ms.toString());
+                                System.out.println("has next   : " + scoreIter.hasNext());
+                                if (cardTags[ findIndex(hand, c) ] > ms.move.type && scoreIter.hasNext()) {
+                                        System.out.println("Better combination: true");
+                                        ms = (MoveScore)scoreIter.next();
+                                        break;
+                                }
+                                hasBetter = false;
+                        }
+                }
+
+
                 int position, movesLeft;
 
-                MoveScore ms = (MoveScore)scoreIter.next();
+                //MoveScore ms = (MoveScore)scoreIter.next();
                 //System.out.println(ms.toString());
                 switch (ms.move.type) {
                         case(Constant.SINGLE):
@@ -141,8 +208,23 @@ public class HeuristicAgent extends Agent implements Constant
                                 movesLeft = otherScore.size();
                 }
 
-                System.out.println("position and leftsize " + position + " " + movesLeft);
-                if (Math.random() + 0.35 > (1 - (position / 1.0*movesLeft))){ 
+                // Showing information for testing.
+                System.out.println("\nHand: " + handToString(hand));
+                if (player.getGameShowMove() != null) {
+                        System.out.println("Show Move: " + handToString(player.getGameShowMove().cards));
+                }
+                //ListIterator newIter = legalScores.listIterator();
+                //while (newIter.hasNext()) {
+                for (MoveScore moveScore : legalScores) {
+                        System.out.println(moveScore.toString());
+                }
+                System.out.println("Choice is : " + ms.toString());
+                SystemFunc.sleep(5000);
+
+
+                double ratio = (canRevo) ? movesLeft/(1.0*position) : position/(1.0*movesLeft);
+                System.out.println("bigger than " + (ratio) + " " + position + " " + movesLeft);
+                if (Math.random() + 0.35 > (ratio)){ 
                         if (!legalMoves.contains(ms.move)) {
                                 SystemFunc.throwException("heuristic agent return not legal move.");
                         }
@@ -171,65 +253,40 @@ public class HeuristicAgent extends Agent implements Constant
                         return new Movement(passCard, false);
                 }
 
-              
 
-                // Play other first.
-                /*
-                if (otherScore.size() != 0) {
-                        if (!legalMoves.contains( otherScore.get(0).move )) {
-                                SystemFunc.throwException("otherScore return move is not legal.");
-                        }
-                        return otherScore.get(0).move;
-                }
-                */
-
-                /*
-
-                // TODO: if other are all pass.
-                if (player.getNumRemainPlayer() - 1 == player.getPassCount()) {
-                        if (otherScore != null) {
-                                return (Movement)otherScore.get(0);
-                        }
-                        if (doubleScore != null) {
-                                return (Movement)doubleScore.get(0);
-                        }
-                        if (singleScore != null) {
-                                return (Movement)doubleScore.get(0);
-                        }
-                        System.out.println("dont play other, single, double...");
-                }
-                */
-
-                // TODO: temporary return.
-                //return (Movement)legalMoves.get(0);
-
-                /*
-                // Compute the score for each move, choose the best.
-                double bestScore = -1;
-                int bestIndex = -1;
-                for (int i = 0; i < legalMoves.size(); ++i) {
-                        Movement move = (Movement)legalMoves.get(i);
-
-                        // Copy hand and history.
-                        boolean[] tempHistory = new boolean[history.length];
-                        System.arraycopy(history, 0, tempHistory, 0, history.length);
-
-                        Card[] left = playCard(hand, move, tempHistory);
-                        //Card[] successor = new Card[hand.length - numPlay];
-                        
-                        //double score = computeValue(left, tempHistory);
-                        //TODO:
-                        double score = -1;
-                        if (score > bestScore) {
-                                bestScore = score;
-                                bestIndex = i;
-                        }
-                }
-                return (Movement)legalMoves.get(bestIndex);
-
-                //return new Movement(null);
-                */
 	}
+        public int[] findPos(Card[] hand, Card[] moveCards)
+        {
+                int[] positions = new int[moveCards.length];
+                int moveIndex = 0;
+                for (int i = 0; i < hand.length; ++i) {
+                        if (hand[i].isEqualTo( moveCards[ moveIndex ] )) {
+                                positions[moveIndex] = i;
+                                moveIndex += 1;
+                        }
+                        if (moveIndex == moveCards.length) break;
+                }
+                return positions;
+        }
+        public int findIndex(Card[] hand, Card c)
+        {
+                for (int i = 0; i < hand.length; ++i) {
+                        if (hand[i].isEqualTo(c)) {
+                                return i;
+                        }
+                }
+                SystemFunc.throwException("cannot find position in hand in Heuristic agent");
+                return -1;
+        }
+        public boolean hasJokerOr8(Movement move) 
+        {
+                // pass
+                if (move == null) return false;
+                for (Card c : move.cards) {
+                        if (c.getIndex() == 0 || c.getRank() == 8 || c.getRank() == 2) return true;
+                }
+                return false;
+        }
         public int listIndex(LinkedList<MoveScore> ll, MoveScore moveScore)
         {
                 int index = 0;
@@ -289,8 +346,9 @@ public class HeuristicAgent extends Agent implements Constant
                 @Override
                 public String toString() {
                         String s = "Move: " + handToString(move.cards) + "\n";
-                        s += "bigScore: " + Double.toString(bigScore);
-                        s += ", smallScore: " + Double.toString(smallScore) + "\n";
+                        s += "big= " + Double.toString(bigScore);
+                        s += ", small= " + Double.toString(smallScore);
+                        s += ", total= " + Double.toString(totalScore) + "\n";
                         return s;
                 }
                 public boolean equalsTo(MoveScore other) {
@@ -341,7 +399,7 @@ public class HeuristicAgent extends Agent implements Constant
                         }
                 }
                 // Not handle already revolution case.
-                smallWeight += numRevable*0.1;
+                smallWeight += numRevable*0.01;
 
                 /*
                 // How many card left in players' hands.
@@ -357,7 +415,7 @@ public class HeuristicAgent extends Agent implements Constant
                         if (!history[i]) num11 += 1;
                 }
                 // Not handle already revolution case.
-                smallWeight += num11 * 0.1;
+                smallWeight += num11 * 0.02;
 
                 int[] numRankLeft = new int[13];
                 for (int i = 1; i < 53; ++i) {

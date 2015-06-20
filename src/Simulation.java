@@ -126,16 +126,17 @@ public class Simulation
 	
 	public static void main(String[] args) throws IOException
 	{
-		Simulation s1 = new Simulation("AlphaBeta_result.txt", 5, new playerAttr(Constant.AlphaBetaAgent, new int[]{5}), 
-													              new playerAttr(Constant.RandomAgent, new int[]{}), 
-													              new playerAttr(Constant.RandomAgent, new int[]{}), 
-													              new playerAttr(Constant.RandomAgent, new int[]{}));
+		Simulation s1 = new Simulation("AlphaBetaWithZero_result.txt", 5, 
+											new playerAttr(Constant.AlphaBetaWithZeroAgent, new int[]{5}), 
+											new playerAttr(Constant.RandomAgent, new int[]{}), 
+											new playerAttr(Constant.RandomAgent, new int[]{}), 
+											new playerAttr(Constant.RandomAgent, new int[]{}));
 		s1.runSimlation();
-		Simulation s2 = new Simulation("MMTS_result.txt", 5, new playerAttr(Constant.MMTSAgent, new int[]{5}), 
-				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
-				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
-				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}));
-		s2.runSimlation();
+//		Simulation s2 = new Simulation("MMTS_result.txt", 5, new playerAttr(Constant.MMTSAgent, new int[]{5}), 
+//				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
+//				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
+//				  									  		 new playerAttr(Constant.RandomAgent, new int[]{}));
+//		s2.runSimlation();
 	}
 }
 

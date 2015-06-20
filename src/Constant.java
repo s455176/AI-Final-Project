@@ -65,4 +65,5 @@ public interface Constant
         static final int MMTSAgent = 3;
         static final int AlphaBetaAgent = 4;
         static final int HeuristicAgent = 5;
+        static final int AlphaBetaWithZeroAgent = 6;
 }

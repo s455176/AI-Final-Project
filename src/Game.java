@@ -1006,6 +1006,9 @@ class playerAttr
 		case Constant.HeuristicAgent:
 			s += "HeuristicAgent" + " ";
 			break;
+		case Constant.AlphaBetaWithZeroAgent:
+			s += "AlphaBetaWithZeroAgent" + " ";
+			break;
 		}
 		for(int i = 0; i < attr.length; i++)
 			s += (attr[i] + ", ");

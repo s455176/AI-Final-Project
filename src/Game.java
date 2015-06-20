@@ -131,6 +131,16 @@ public class Game extends JPanel implements ActionListener
 			thinking[i] = new timeMeasure();
 		}
 	}
+	
+	public Game(playerAttr p0, playerAttr p1, playerAttr p2, playerAttr p3) throws IOException
+	{
+		this();
+		players[0] = new Player(this, 0, p0.getType(), p0.getAttr());
+		players[1] = new Player(this, 1, p1.getType(), p1.getAttr());
+		players[2] = new Player(this, 2, p2.getType(), p2.getAttr());
+		players[3] = new Player(this, 3, p3.getType(), p3.getAttr());
+	}
+	
 	public void reset()
 	{
 		for(int i = 0; i < Constant.numPlayer; i++)
@@ -406,7 +416,9 @@ public class Game extends JPanel implements ActionListener
 				drawBackCards(playerIndex, false);
 			}
 			// draw the cards show in the middle
+			System.out.println("showMove before: " + showMove);
 			drawShowCards(move);
+			System.out.println("showMove after : " + showMove);
 			for(int i = 0; i < move.numCards; i++)
 			{
 				if(history[move.cards[i].getIndex()])
@@ -955,7 +967,51 @@ class timeMeasure
 	}
 }
 
-
+class playerAttr
+{
+	private int agentType;
+	private int[] attr;
+	
+	playerAttr(int type, int[] attr)
+	{
+		this.agentType = type;
+		this.attr = attr;
+	}
+	public int getType()
+	{
+		return this.agentType;
+	}
+	public int[] getAttr()
+	{
+		return this.attr;
+	}
+	public String toString()
+	{
+		String s = "";
+		
+		switch(agentType)
+		{
+		case Constant.AlphaBetaAgent:
+			s += "AlphaBetaAgent" + " ";
+			break;
+		case Constant.MMTSAgent:
+			s += "MMTSAgent" + " ";
+			break;
+		case Constant.MCTSAgent:
+			s += "MCTSAgent" + " ";
+			break;
+		case Constant.RandomAgent:
+			s += "RandomAgent" + " ";
+			break;
+		case Constant.HeuristicAgent:
+			s += "HeuristicAgent" + " ";
+			break;
+		}
+		for(int i = 0; i < attr.length; i++)
+			s += (attr[i] + ", ");
+		return s;
+	}
+}
 
 
 

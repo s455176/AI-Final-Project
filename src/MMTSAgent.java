@@ -132,7 +132,7 @@ public class MMTSAgent extends Agent
 	
 	public double runMaxNode(Node n, int depth)
 	{
-		System.out.println("maxNode" + " " + depth);
+//		System.out.println("maxNode" + " " + depth);
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
@@ -163,7 +163,7 @@ public class MMTSAgent extends Agent
 	
 	public double runMinNode(Node n, int depth)
 	{
-		System.out.println("minNode" + " " + depth);
+//		System.out.println("minNode" + " " + depth);
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		

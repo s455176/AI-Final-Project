@@ -31,16 +31,16 @@ public class Player
 				agent = new MCTSAgent(this, agentAttr[0], agentAttr[1]);
 				break;
 			case Constant.MMTSAgent:
-				agent = new MMTSAgent(this, agentAttr[0]);
+				agent = new MMTSAgent(this, agentAttr[0], agentAttr[1]);
 				break;
 			case Constant.AlphaBetaAgent:
-				agent = new AlphaBetaAgent(this, agentAttr[0]);
+				agent = new AlphaBetaAgent(this, agentAttr[0], agentAttr[1]);
 				break;
             case Constant.HeuristicAgent:
                 agent = new HeuristicAgent(this);
                 break;
             case Constant.AlphaBetaWithZeroAgent:
-            	agent = new AlphaBetaWithZeroAgent(this, agentAttr[0]);
+            	agent = new AlphaBetaWithZeroAgent(this, agentAttr[0], agentAttr[1]);
             	break;
 			default:
 				SystemFunc.throwException("no such agent type");

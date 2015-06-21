@@ -72,7 +72,7 @@ public class Game extends JPanel implements ActionListener
 		}
 		// initialize different agent
 		//players[0] = new Player(this, 0, Constant.AlphaBetaAgent, new int[]{5});
-		players[0] = new Player(this, 0, Constant.AlphaBetaAgent, new int[]{5});
+		players[0] = new Player(this, 0, Constant.AlphaBetaAgent, new int[]{5, 10});
 //		players[1] = new Player(this, 1, Constant.MCTSAgent, new int[]{40, 10});
 //		players[2] = new Player(this, 2, Constant.MCTSAgent, new int[]{30, 10});
 //		players[3] = new Player(this, 3, Constant.MCTSAgent, new int[]{20, 10});
@@ -841,7 +841,7 @@ public class Game extends JPanel implements ActionListener
 			
 			// update the recorded time
 			total[turn].update(elapsedTime);
-			if(record.curNumLegalMove != 1)
+			if(record != null && record.curNumLegalMove != 1)
 				thinking[turn].update(elapsedTime);
 			
 			// after player do a moment

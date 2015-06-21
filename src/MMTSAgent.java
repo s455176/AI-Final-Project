@@ -4,12 +4,16 @@ import java.util.LinkedList;
 public class MMTSAgent extends Agent
 {
 	public int NUM_DEPTH = 3;
+	public MoveScore[] scoreList;
 	
-	public MMTSAgent(Player player, int depth)
+	public MMTSAgent(Player player, int depth, double timeLimit)
 	{
 		this.player = player;
 		this.NUM_DEPTH = depth;
 		this.type = Constant.MMTSAgent;
+		this.scoreList = null;
+		this.startTime = -1;
+		this.timeLimit = timeLimit;
 	}
 	
 	@Override
@@ -29,34 +33,37 @@ public class MMTSAgent extends Agent
 		if(numElement == 1)
 			return ll.get(0);		
 		
-		GameState childGs = new GameState(gs);
-		childGs.doMove(gs.next, ll.get(0));
-		Node childNode = new Node(ll.get(0), childGs);
-		double maxScore;
+		// set the startTime in order to use the isTimesUp function
+		startTime = System.currentTimeMillis();
+		scoreList = new MoveScore[numElement];
+		for(int i = 0; i < scoreList.length; i++)
+			scoreList[i] = new MoveScore();
 		
-		if(childGs.next != player.index)
-			 maxScore = runMinNode(childNode, NUM_DEPTH);
-		else
-			 maxScore = runMaxNode(childNode, NUM_DEPTH);
+		int curDepth = 1;
 		
+		while(!isTimesUp() && curDepth <= NUM_DEPTH)
+		{
+			Node n = new Node(null, gs);
+			runMaxNode(n, curDepth, curDepth);
+			curDepth += 1;
+		}
+		
+		startTime = -1;
+		
+		// choose the move with biggest score(need to modify to consider occur depth)
 		int maxIndex = 0;
+		double maxScore = scoreList[0].score;
+		double minOccur = scoreList[0].occur;
+		System.out.println(ll.get(0) + " " + scoreList[0].score + " " + scoreList[0].occur + " " + scoreList[0].depth);
 		for(int i = 1; i < numElement; i++)
 		{
-			childGs = new GameState(gs);
-			childGs.doMove(gs.next, ll.get(i));
-			childNode = new Node(ll.get(i), childGs);
-			
-			double score;
-			if(childGs.next != player.index)
-				 score = runMinNode(childNode, NUM_DEPTH);
-			else
-				 score = runMaxNode(childNode, NUM_DEPTH);
-			
-			if(score > maxScore)
+			if((scoreList[i].score > maxScore) || (scoreList[i].score == maxScore && scoreList[i].occur < minOccur))
 			{
-				maxScore = score;
 				maxIndex = i;
+				maxScore = scoreList[i].score;
+				minOccur = scoreList[i].occur;
 			}
+			System.out.println(ll.get(i) + " " + scoreList[i].score + " " + scoreList[i].occur + " " + scoreList[i].depth);
 		}
 		
 		return ll.get(maxIndex);
@@ -130,17 +137,22 @@ public class MMTSAgent extends Agent
 		return -total;
 	}
 	
-	public double runMaxNode(Node n, int depth)
+	public searchReturn runMaxNode(Node n, int depth, int target)
 	{
 //		System.out.println("maxNode" + " " + depth);
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
 		// termination condition 
-		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
-			return evaluation(n);
+		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1 || isTimesUp())
+		{
+			return new searchReturn(evaluation(n), target - depth);
+		}
 
-		double m = -Double.MAX_VALUE;
+		searchReturn m = new searchReturn();
+		
+		m.score = -Double.MAX_VALUE;
+		m.depth = -1;
 		
 		for(int i = 0; i < ll.size(); i++)
 		{
@@ -148,30 +160,38 @@ public class MMTSAgent extends Agent
 			childGs.doMove(n.gs.next, ll.get(i));
 			Node childNode = new Node(ll.get(i), childGs);
 			
-			double t;
+			searchReturn t;
 			if(childGs.next != player.index)
-				t = runMinNode(childNode, depth - 1);
+				t = runMinNode(childNode, depth - 1, target);
 			else
-				t = runMaxNode(childNode, depth - 1);
+				t = runMaxNode(childNode, depth - 1, target);
 			
-			if(t > m)
+			if(target == depth)
+				scoreList[i].update(t);
+			
+			if(t.score > m.score)
 				m = t;
 		}
 			
 		return m;
 	}
 	
-	public double runMinNode(Node n, int depth)
+	public searchReturn runMinNode(Node n, int depth, int target)
 	{
 //		System.out.println("minNode" + " " + depth);
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
 		// termination condition 
-		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
-			return evaluation(n);
+		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1 || isTimesUp())
+		{
+			return new searchReturn(evaluation(n), target - depth);
+		}
+
+		searchReturn m = new searchReturn();
 		
-		double m = Double.MAX_VALUE;
+		m.score = -Double.MAX_VALUE;
+		m.depth = -1;
 		
 		for(int i = 0; i < ll.size(); i++)
 		{
@@ -179,13 +199,13 @@ public class MMTSAgent extends Agent
 			childGs.doMove(n.gs.next, ll.get(i));
 			Node childNode = new Node(ll.get(i), childGs);
 			
-			double t;
+			searchReturn t;
 			if(childGs.next != player.index)
-				t = runMinNode(childNode, depth - 1);
+				t = runMinNode(childNode, depth - 1, target);
 			else
-				t = runMaxNode(childNode, depth - 1);
+				t = runMaxNode(childNode, depth - 1, target);
 			
-			if(t < m)
+			if(t.score < m.score)
 				m = t;
 		}
 			
@@ -218,4 +238,63 @@ public class MMTSAgent extends Agent
 		}
 	}
 }
+class MoveScore
+{
+	public double score;
+	public int depth;
+	public int occur;
+	
+	public MoveScore()
+	{
+		this.score = -Double.MAX_VALUE;
+		this.depth = -1;
+		this.occur = -1;
+	}
+	
+	public MoveScore(double score, int depth, int occur)
+	{
+		this.score = score;
+		this.depth = depth;
+		this.occur = occur;
+	}
+	
+	// need modify to record the occur depth
+	public void update(searchReturn sr)
+	{
+		boolean canUpdate = (sr.depth > this.depth) || (sr.depth == this.depth && sr.score > this.score);
+		boolean updateOccur = canUpdate && sr.score != this.score;
+		
+		if(canUpdate)
+		{
+			this.score = sr.score;
+			this.depth = sr.depth;
+		}
+		
+		if(updateOccur)
+			this.occur = sr.depth;
+	}
+}
+
+class searchReturn
+{
+	public double score;
+	public int depth;
+	
+	public searchReturn()
+	{
+		this.score = -Double.MAX_VALUE;
+		this.depth = -1;
+	}
+	
+	public searchReturn(double score, int depth)
+	{
+		this.score = score;
+		this.depth = depth;
+	}
+}
+
+
+
+
+
 

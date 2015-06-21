@@ -2,23 +2,25 @@ import java.util.LinkedList;
 
 public class AlphaBetaAgent extends MMTSAgent
 {
-	public AlphaBetaAgent(Player player, int depth)
+	public AlphaBetaAgent(Player player, int depth, double timeLimit)
 	{
-		super(player, depth);
+		super(player, depth, timeLimit);
 		this.type = Constant.AlphaBetaAgent;
 	}
 	
-	public double runMaxNode(Node n, int depth, double alpha, double beta)
+	public searchReturn runMaxNode(Node n, int depth, searchReturn alpha, searchReturn beta, int target)
 	{
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
 		// System.out.println(numMove + " " + depth);
 		// termination condition 
-		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
-			return evaluation(n);
+		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1 || isTimesUp())
+		{
+			return new searchReturn(evaluation(n), target - depth);
+		}
 
-		double m = alpha;
+		searchReturn m = alpha;
 		
 		for(int i = 0; i < ll.size(); i++)
 		{
@@ -26,33 +28,38 @@ public class AlphaBetaAgent extends MMTSAgent
 			childGs.doMove(n.gs.next, ll.get(i));
 			Node childNode = new Node(ll.get(i), childGs);
 			
-			double t;
+			searchReturn t;
 			if(childGs.next != player.index)
-				t = runMinNode(childNode, depth - 1, m, beta);
+				t = runMinNode(childNode, depth - 1, m, beta, target);
 			else
-				t = runMaxNode(childNode, depth - 1, m, beta);
+				t = runMaxNode(childNode, depth - 1, m, beta, target);
 			
-			if(t > m)
+			if(target == depth)
+				scoreList[i].update(t);
+			
+			if(t.score > m.score)
 				m = t;
 			
-			if(m >= beta)
+			if(m.score >= beta.score)
 				return m;
 		}
 			
 		return m;
 	}
 	
-	public double runMinNode(Node n, int depth, double alpha, double beta)
+	public searchReturn runMinNode(Node n, int depth, searchReturn alpha, searchReturn beta, int target)
 	{
 		LinkedList<Movement> ll = n.gs.genMove(n.gs.next);
 		int numMove = ll.size();
 		
 		// System.out.println(numMove + " " + depth);
 		// termination condition 
-		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1)
-			return evaluation(n);
+		if(depth == 0 || numMove == 0 || n.gs.remainPlayer <= 1 || isTimesUp())
+		{
+			return new searchReturn(evaluation(n), target - depth);
+		}
 		
-		double m = beta;
+		searchReturn m = beta;
 		
 		for(int i = 0; i < ll.size(); i++)
 		{
@@ -60,16 +67,16 @@ public class AlphaBetaAgent extends MMTSAgent
 			childGs.doMove(n.gs.next, ll.get(i));
 			Node childNode = new Node(ll.get(i), childGs);
 			
-			double t;
+			searchReturn t;
 			if(childGs.next != player.index)
-				t = runMinNode(childNode, depth - 1, alpha, m);
+				t = runMinNode(childNode, depth - 1, alpha, m, target);
 			else
-				t = runMaxNode(childNode, depth - 1, alpha, m);
+				t = runMaxNode(childNode, depth - 1, alpha, m, target);
 			
-			if(t < m)
+			if(t.score < m.score)
 				m = t;
 			
-			if(m <= alpha)
+			if(m.score <= alpha.score)
 				return m;
 		}
 			
@@ -91,41 +98,50 @@ public class AlphaBetaAgent extends MMTSAgent
 		
 		// if only one move left, then just return the move
 		if(numElement == 1)
-			return ll.get(0);			
+			return ll.get(0);		
 		
-		double alpha = -Double.MAX_VALUE;
-		double beta = Double.MAX_VALUE;
+		// set the startTime in order to use the isTimesUp function
+		startTime = System.currentTimeMillis();
+		scoreList = new MoveScore[numElement];
+		for(int i = 0; i < scoreList.length; i++)
+			scoreList[i] = new MoveScore();
 		
-		GameState childGs = new GameState(gs);
-		childGs.doMove(gs.next, ll.get(0));
-		Node childNode = new Node(ll.get(0), childGs);
+		int curDepth = 1;
 		
-		if(childGs.next != player.index)
-			alpha = runMinNode(childNode, NUM_DEPTH, alpha, beta);
-		else
-			alpha = runMaxNode(childNode, NUM_DEPTH, alpha, beta);
-
-		int bestIndex = 0;
-		for(int i = 1; i < numElement; i++)
+		searchReturn alpha = new searchReturn();
+		searchReturn beta = new searchReturn();
+		
+		alpha.score = -Double.MAX_VALUE;
+		alpha.depth = -1;
+		beta.score = Double.MAX_VALUE;
+		beta.depth = -1;
+		
+		while(!isTimesUp() && curDepth <= NUM_DEPTH)
 		{
-			childGs = new GameState(gs);
-			childGs.doMove(gs.next, ll.get(i));
-			childNode = new Node(ll.get(i), childGs);
-			
-			double score;
-			if(childGs.next != player.index)
-				score = runMinNode(childNode, NUM_DEPTH, alpha, beta);
-			else
-				score = runMaxNode(childNode, NUM_DEPTH, alpha, beta);
-			
-			if(score > alpha)
-			{
-				alpha = score;
-				bestIndex = i;
-			}
+			Node n = new Node(null, gs);
+			runMaxNode(n, curDepth, alpha, beta, curDepth);
+			curDepth += 1;
 		}
 		
-		return ll.get(bestIndex);
+		startTime = -1;
+		
+		// choose the move with biggest score(need to modify to consider occur depth)
+		int maxIndex = 0;
+		double maxScore = scoreList[0].score;
+		double minOccur = scoreList[0].occur;
+		System.out.println(ll.get(0) + " " + scoreList[0].score + " " + scoreList[0].occur + " " + scoreList[0].depth);
+		for(int i = 1; i < numElement; i++)
+		{
+			if((scoreList[i].score > maxScore) || (scoreList[i].score == maxScore && scoreList[i].occur < minOccur))
+			{
+				maxIndex = i;
+				maxScore = scoreList[i].score;
+				minOccur = scoreList[i].occur;
+			}
+			System.out.println(ll.get(i) + " " + scoreList[i].score + " " + scoreList[i].occur + " " + scoreList[i].depth);
+		}
+		
+		return ll.get(maxIndex);
 	}
 }
 

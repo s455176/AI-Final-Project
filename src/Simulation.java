@@ -125,43 +125,41 @@ public class Simulation
 	}
 	
 	public static void main(String[] args) throws IOException
-	{
-		
-		
-		Simulation s2 = new Simulation("temp.txt", 2, 
+	{		
+		Simulation s1 = new Simulation("MCTS_result_with_timeLimit.txt", 30, 
 					 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 10}), 
 			  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
 			  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
 			  		 new playerAttr(Constant.RandomAgent, new int[]{}));
-		s2.runSimlation();
-//		
-//		Simulation s3 = new Simulation("MMTS_result_with_timeLimit.txt", 30, 
-//					 new playerAttr(Constant.MMTSAgent, new int[]{10, 20}), 
-//			  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
-//			  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
-//			  		 new playerAttr(Constant.RandomAgent, new int[]{}));
-//		s3.runSimlation();
+		s1.runSimlation();
 		
-//		Simulation s4 = new Simulation("Heuristic_vs_AlphaBeta.txt", 30, 
-//				 new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 10}), 
-//		  		 new playerAttr(Constant.HeuristicAgent, new int[]{}), 
-//		  		 new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 20}), 
-//		  		 new playerAttr(Constant.RandomAgent, new int[]{}));
-//		s4.runSimlation();
-//		
-//		Simulation s5 = new Simulation("MCTS_vs_AlphaBeta.txt", 30, 
-//											new playerAttr(Constant.MCTSAgent, new int[]{20, 50}), 
-//											new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 10}), 
-//											new playerAttr(Constant.MCTSAgent, new int[]{40, 80}), 
-//											new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 20}));
-//		s5.runSimlation();
-//		
-//		Simulation s1 = new Simulation("Heuristic_vs_MCTS.txt", 30, 
-//				 new playerAttr(Constant.HeuristicAgent, new int[]{}), 
-//		  		 new playerAttr(Constant.MCTSAgent, new int[]{20, 50}), 
-//		  		 new playerAttr(Constant.MCTSAgent, new int[]{40, 80}), 
-//		  		 new playerAttr(Constant.RandomAgent, new int[]{}));
-//		s1.runSimlation();
+		Simulation s2 = new Simulation("MCTS_result_with_timeLimit.txt", 30, 
+				 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 20}), 
+		  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
+		  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
+		  		 new playerAttr(Constant.RandomAgent, new int[]{}));
+		s2.runSimlation();
+
+		Simulation s3 = new Simulation("MCTS_with_timeLimit_vs_Heuristic.txt", 30, 
+				 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 20}), 
+		  		 new playerAttr(Constant.HeuristicAgent, new int[]{}), 
+		  		 new playerAttr(Constant.RandomAgent, new int[]{}), 
+		  		 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 10}));
+		s3.runSimlation();
+		
+		Simulation s4 = new Simulation("MCTS_with_timeLimit_vs_AlphaBeta.txt", 30, 
+				 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 20}), 
+		  		 new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 10}), 
+		  		 new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 20}), 
+		  		 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 10}));
+		s4.runSimlation();
+
+		Simulation s5 = new Simulation("MCTS_with_timeLimit_vs_all_other.txt", 30, 
+				 new playerAttr(Constant.MCTSAgent, new int[]{40, 80, 20}), 
+		  		 new playerAttr(Constant.HeuristicAgent, new int[]{}), 
+		  		 new playerAttr(Constant.AlphaBetaAgent, new int[]{10, 20}), 
+		  		 new playerAttr(Constant.RandomAgent, new int[]{}));
+		s5.runSimlation();
 	}
 }
 

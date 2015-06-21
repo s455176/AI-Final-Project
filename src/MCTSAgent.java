@@ -59,7 +59,7 @@ public class MCTSAgent extends Agent
 		for(int i = 1; i < root.children.length; i++)
 		{
 			double s = root.children[i].score[player.index] / root.children[i].count;
-			if(best_score > s)
+			if(root.children[i].count >= 1 && best_score > s)
 			{
 				best_score = s;
 				best_child = i;
@@ -82,11 +82,23 @@ public class MCTSAgent extends Agent
 			if(numMove <= 0) return ;
 			
 			// SIMULATION
+			int count = 0;
+			int index = 0;
+			while(count < simulateNum)
+			{
+				startNode.children[index].simulate();
+				index = (index + 1) % startNode.children.length;
+				
+				if(index == 0)
+					count++;
+				
+				if(isTimesUp())
+					break;
+			}
+			
+			// BACK PROPORGATION
 			for(int i = 0; i < startNode.children.length; i++)
 			{
-				startNode.children[i].simulate();
-				
-				// BACK PROPORGATION
 				for(int j = 0; j < Constant.numPlayer; j++)
 					startNode.score[j] += startNode.children[i].score[j];
 				
@@ -171,17 +183,11 @@ public class MCTSAgent extends Agent
 		}
 		public void simulate()
 		{
-			for(int i = 0; i < simulateNum; i++)
-			{
-				SimulatedGame sg = new SimulatedGame(gs);
-				int[] result = sg.startSimulate();
-				for(int j = 0; j < Constant.numPlayer; j++)
-					score[j] += (double)result[j];
-				count++;
-				
-				if(isTimesUp())
-					break;
-			}
+			SimulatedGame sg = new SimulatedGame(gs);
+			int[] result = sg.startSimulate();
+			for(int j = 0; j < Constant.numPlayer; j++)
+				score[j] += (double)result[j];
+			count++;
 		}
 	}
 }

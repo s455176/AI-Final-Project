@@ -8,13 +8,15 @@ public class MCTSAgent extends Agent
 	private int iteration = 10;
 	// private Random rn;
 	
-	public MCTSAgent(Player player, int sumulateNum, int iteration)
+	public MCTSAgent(Player player, int sumulateNum, int iteration, double timeLimit)
 	{
 		this.player = player;
 		// rn = new Random();
 		this.simulateNum = sumulateNum;
 		this.iteration = iteration;
 		this.type = Constant.MCTSAgent;
+		this.timeLimit = timeLimit;
+		this.startTime = -1;
 	}
 	
 	public Movement decideMove()
@@ -36,12 +38,16 @@ public class MCTSAgent extends Agent
 		Node root = new Node(null, gs);
 		int count = 0;
 		
-		while(count < iteration)
+		startTime = System.currentTimeMillis();
+		
+		while(!isTimesUp() && count < iteration)
 		{
 			// System.out.println(count);
 			runMCTS(root);
 			count++;
 		}
+		
+		startTime = -1;
 		
 		if(root.children.length == 0)
 			SystemFunc.throwException("No move can be chose in MCTSAGent");
@@ -171,8 +177,11 @@ public class MCTSAgent extends Agent
 				int[] result = sg.startSimulate();
 				for(int j = 0; j < Constant.numPlayer; j++)
 					score[j] += (double)result[j];
+				count++;
+				
+				if(isTimesUp())
+					break;
 			}
-			count += simulateNum;
 		}
 	}
 }

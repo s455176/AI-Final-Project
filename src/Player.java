@@ -28,7 +28,7 @@ public class Player
 				agent = new TestAgent(this);
 				break;
 			case Constant.MCTSAgent:
-				agent = new MCTSAgent(this, agentAttr[0], agentAttr[1]);
+				agent = new MCTSAgent(this, agentAttr[0], agentAttr[1], agentAttr[2]);
 				break;
 			case Constant.MMTSAgent:
 				agent = new MMTSAgent(this, agentAttr[0], agentAttr[1]);
